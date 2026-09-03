@@ -1,0 +1,94 @@
+docs/
+
+README.md
+
+01-Project-Charter.md
+
+02-Software-Requirement-Specification.md
+
+03-Business-Process.md
+
+04-Use-Case.md
+
+05-System-Architecture.md
+
+06-Database-Design.md
+
+07-RLS-Policy.md
+
+08-API-Design.md
+
+09-Frontend-Architecture.md
+
+10-UIUX-Guidelines.md
+
+11-Landing-Page.md
+
+12-Admin-CMS.md
+
+13-Guru-Portal.md
+
+14-Siswa-Portal.md
+
+15-Alumni-Portal.md
+
+16-Project-Roadmap.md
+
+17-Coding-Standards.md
+
+18-Deployment.md
+
+19-Testing.md
+
+20-Maintenance.md
+
+Markdown (.md) sebagai sumber utama dokumentasi.
+GitHub sebagai penyimpanan dan version control.
+Mermaid untuk diagram sederhana langsung di Markdown.
+Draw.io untuk diagram kompleks (arsitektur, ERD, use case).
+Pandoc atau generator dokumentasi jika nanti perlu menghasilkan PDF atau DOCX untuk kebutuhan resmi.
+
+mosys-docs/
+│
+├── README.md
+│
+├── docs/
+│
+│   ├── 01-project-charter.md
+│   ├── 02-srs.md
+│   ├── 03-business-process.md
+│   ├── 04-use-case.md
+│   ├── 05-architecture.md
+│   ├── 06-database.md
+│   ├── 07-rls-policy.md
+│   ├── 08-api.md
+│   ├── 09-frontend.md
+│   ├── 10-uiux.md
+│   ├── 11-landing-page.md
+│   ├── 12-admin-cms.md
+│   ├── 13-guru.md
+│   ├── 14-siswa.md
+│   ├── 15-alumni.md
+│   ├── 16-roadmap.md
+│   ├── 17-coding-standard.md
+│   ├── 18-deployment.md
+│   ├── 19-testing.md
+│   ├── 20-maintenance.md
+│   └── 21-future-development.md
+│
+├── diagrams/
+│   ├── architecture.drawio
+│   ├── database.drawio
+│   ├── usecase.drawio
+│   └── workflow.drawio
+│
+├── assets/
+│   ├── logo/
+│   ├── screenshots/
+│   ├── ui/
+│   └── icons/
+│
+└── database/
+    ├── schema.sql
+    ├── seed.sql
+    └── rls.sql
