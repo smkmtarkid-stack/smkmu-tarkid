@@ -65,13 +65,17 @@ export default function LoginPage() {
         // Ambil profil / role pengguna dari tabel users
         const { data: profileData, error: profileError } = await supabase
           .from("users")
-          .select("role")
+          .select("role, status")
           .eq("email", data.email)
           .single();
 
         if (profileError || !profileData) {
           toast.success("Berhasil masuk (Role tidak ditemukan, arahkan ke Beranda)");
           router.push("/");
+        } else if (profileData.status === "inactive") {
+          // Akun dinonaktifkan - tolak akses
+          await supabase.auth.signOut();
+          toast.error("Akun Anda telah dinonaktifkan. Hubungi administrator.");
         } else {
           toast.success("Berhasil masuk!");
           // Arahkan sesuai role

@@ -263,3 +263,25 @@ CREATE POLICY "Anon Write WaliSiswa" ON public.walisiswa FOR ALL USING (true);
 -- Buat Bucket bernama "uploads" di Supabase Dashboard -> Storage -> Create New Bucket
 -- Set bucket "uploads" sebagai PUBLIC.
 
+-- ===============================================================================================
+-- 23. PENGATURAN (Settings/Contact Info)
+-- ===============================================================================================
+CREATE TABLE public.pengaturan (
+    id INT PRIMARY KEY DEFAULT 1,
+    alamat TEXT,
+    telepon VARCHAR(50),
+    email VARCHAR(100),
+    whatsapp VARCHAR(50),
+    facebook TEXT,
+    instagram TEXT,
+    youtube TEXT,
+    tiktok TEXT,
+    map_embed TEXT,
+    jam_operasional TEXT,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+ALTER TABLE public.pengaturan ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Read Pengaturan" ON public.pengaturan FOR SELECT USING (true);
+CREATE POLICY "Anon Write Pengaturan" ON public.pengaturan FOR ALL USING (true);
+

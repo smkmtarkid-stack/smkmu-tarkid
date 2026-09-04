@@ -40,26 +40,25 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
   return (
     <AnimatePresence>
       {open && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            key="mobile-nav-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden"
-          />
-
-          {/* Panel */}
-          <motion.div
-            key="mobile-nav-panel"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-[85%] max-w-sm bg-background shadow-2xl lg:hidden flex flex-col"
-          >
+        <motion.div
+          key="mobile-nav-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden"
+        />
+      )}
+      
+      {open && (
+        <motion.div
+          key="mobile-nav-panel"
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="fixed top-0 right-0 bottom-0 z-50 w-[85%] max-w-sm bg-background shadow-2xl lg:hidden flex flex-col"
+        >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
               <Link href="/" className="flex items-center gap-3" onClick={onClose}>
@@ -165,7 +164,6 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               </Link>
             </div>
           </motion.div>
-        </>
       )}
     </AnimatePresence>
   );

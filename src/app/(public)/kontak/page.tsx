@@ -2,13 +2,28 @@ import { SectionTitle } from "@/components/common/section-title";
 import { siteConfig } from "@/constants/site";
 import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
 export const metadata = {
   title: "Kontak | SMK Muhammadiyah Tarogong Kidul",
   description: "Hubungi SMK Muhammadiyah Tarogong Kidul",
 };
 
-export default function KontakPage() {
+export const revalidate = 60;
+
+export default async function KontakPage() {
+  const { data: pengaturan } = await supabase
+    .from("pengaturan")
+    .select("*")
+    .eq("id", 1)
+    .single();
+
+  const address = pengaturan?.alamat || siteConfig.contact.address;
+  const phone = pengaturan?.telepon || siteConfig.contact.phone;
+  const email = pengaturan?.email || siteConfig.contact.email;
+  const jamOperasional = pengaturan?.jam_operasional || "Senin - Jumat: 07.00 - 15.00 WIB\nSabtu: 07.00 - 12.00 WIB";
+  const mapEmbedUrl = pengaturan?.map_embed || siteConfig.maps.embedUrl;
+
   return (
     <div className="pt-24 pb-16 min-h-screen bg-muted/30">
       <div className="container-custom max-w-5xl">
@@ -27,7 +42,7 @@ export default function KontakPage() {
               </div>
               <div>
                 <h3 className="font-bold text-lg mb-1">Alamat</h3>
-                <p className="text-muted-foreground">{siteConfig.contact.address}</p>
+                <p className="text-muted-foreground whitespace-pre-line">{address}</p>
               </div>
             </div>
 
@@ -37,7 +52,7 @@ export default function KontakPage() {
               </div>
               <div>
                 <h3 className="font-bold text-lg mb-1">Telepon</h3>
-                <p className="text-muted-foreground">{siteConfig.contact.phone}</p>
+                <p className="text-muted-foreground">{phone}</p>
               </div>
             </div>
 
@@ -47,7 +62,7 @@ export default function KontakPage() {
               </div>
               <div>
                 <h3 className="font-bold text-lg mb-1">Email</h3>
-                <p className="text-muted-foreground">{siteConfig.contact.email}</p>
+                <p className="text-muted-foreground">{email}</p>
               </div>
             </div>
 
@@ -57,8 +72,7 @@ export default function KontakPage() {
               </div>
               <div>
                 <h3 className="font-bold text-lg mb-1">Jam Operasional</h3>
-                <p className="text-muted-foreground">Senin - Jumat: 07.00 - 15.00 WIB</p>
-                <p className="text-muted-foreground">Sabtu: 07.00 - 12.00 WIB</p>
+                <p className="text-muted-foreground whitespace-pre-line">{jamOperasional}</p>
               </div>
             </div>
           </div>
@@ -66,7 +80,7 @@ export default function KontakPage() {
           {/* Map */}
           <div className="bg-background rounded-2xl border shadow-sm overflow-hidden">
             <iframe
-              src={siteConfig.maps.embedUrl}
+              src={mapEmbedUrl}
               width="100%"
               height="100%"
               style={{ border: 0, minHeight: "400px" }}

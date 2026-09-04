@@ -47,7 +47,7 @@ export function Navbar() {
                   priority
                 />
               </div>
-              <div className="hidden sm:block">
+              <div className="flex flex-col justify-center">
                 <p
                   className={cn(
                     "font-bold text-sm lg:text-base leading-tight transition-colors",

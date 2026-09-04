@@ -120,6 +120,8 @@ export const adminNav = [
       { label: "Data Alumni", href: "/dashboard/admin/alumni", icon: "GraduationCap" },
       { label: "Keuangan & SPP", href: "/dashboard/admin/keuangan", icon: "Wallet" },
       { label: "Proses Naik Kelas", href: "/dashboard/admin/keuangan/naik-kelas", icon: "ArrowUpCircle" },
+      { label: "Pengaturan Website", href: "/dashboard/admin/pengaturan", icon: "Settings" },
+      { label: "Manajemen Akun", href: "/dashboard/admin/manajemen-akun", icon: "UserCog" },
     ]
   },
   { label: "Berita", href: "/dashboard/admin/berita", icon: "FileText" },
