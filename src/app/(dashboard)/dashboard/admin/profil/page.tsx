@@ -18,7 +18,7 @@ const columns: ColumnDef[] = [
 const formFields: FieldDef[] = [
   { key: "judul", label: "Judul / Bagian", required: true, placeholder: "Visi Misi, Sejarah, Sambutan, dll" },
   { key: "keterangan", label: "Nama Kepala Sekolah / Keterangan", placeholder: "Hanya untuk Sambutan Kepsek" },
-  { key: "gambar", label: "Foto Kepala Sekolah / Gambar Profil", type: "image" },
+  { key: "gambar", label: "Foto Kepala Sekolah / Gambar Profil", type: "file" },
   { key: "isi", label: "Isi Konten", type: "textarea", required: true },
 ];
 
