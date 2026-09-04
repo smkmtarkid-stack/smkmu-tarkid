@@ -100,7 +100,7 @@ export default function KeuanganDashboardPage() {
           metode_pembayaran,
           petugas,
           tanggal_bayar,
-          siswa:id_siswa (nama, nis, kelas)
+          siswa (nama, nis, kelas)
         `)
         .gte("tanggal_bayar", startISO)
         .lte("tanggal_bayar", endISO)
