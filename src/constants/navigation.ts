@@ -106,7 +106,6 @@ export const footerNavigation = {
 // Dashboard navigations are defined below
 export const adminNav = [
   { label: "Dashboard", href: "/dashboard/admin", icon: "LayoutDashboard" },
-  { label: "Manajemen Profil", href: "/dashboard/admin/profil", icon: "School" },
   {
     label: "Data Administrasi",
     icon: "Database",
@@ -120,18 +119,25 @@ export const adminNav = [
       { label: "Data Alumni", href: "/dashboard/admin/alumni", icon: "GraduationCap" },
       { label: "Keuangan & SPP", href: "/dashboard/admin/keuangan", icon: "Wallet" },
       { label: "Proses Naik Kelas", href: "/dashboard/admin/keuangan/naik-kelas", icon: "ArrowUpCircle" },
-      { label: "Pengaturan Website", href: "/dashboard/admin/pengaturan", icon: "Settings" },
-      { label: "Manajemen Akun", href: "/dashboard/admin/manajemen-akun", icon: "UserCog" },
     ]
   },
-  { label: "Berita", href: "/dashboard/admin/berita", icon: "FileText" },
   { label: "Pengumuman", href: "/dashboard/admin/pengumuman", icon: "Bell" },
-  { label: "Agenda", href: "/dashboard/admin/agenda", icon: "Calendar" },
-  { label: "Prestasi", href: "/dashboard/admin/prestasi", icon: "Trophy" },
-  { label: "Galeri", href: "/dashboard/admin/galeri", icon: "Image" },
   { label: "PPDB", href: "/dashboard/admin/ppdb", icon: "UserPlus" },
   { label: "Download", href: "/dashboard/admin/download", icon: "Download" },
-  { label: "Slider", href: "/dashboard/admin/slider", icon: "MonitorPlay" },
+  {
+    label: "Pengaturan",
+    icon: "Settings",
+    children: [
+      { label: "Manajemen Profil", href: "/dashboard/admin/profil", icon: "School" },
+      { label: "Pengaturan Website", href: "/dashboard/admin/pengaturan", icon: "Settings" },
+      { label: "Manajemen Akun", href: "/dashboard/admin/manajemen-akun", icon: "UserCog" },
+      { label: "Berita", href: "/dashboard/admin/berita", icon: "FileText" },
+      { label: "Prestasi", href: "/dashboard/admin/prestasi", icon: "Trophy" },
+      { label: "Agenda", href: "/dashboard/admin/agenda", icon: "Calendar" },
+      { label: "Galeri", href: "/dashboard/admin/galeri", icon: "Image" },
+      { label: "Slider", href: "/dashboard/admin/slider", icon: "MonitorPlay" },
+    ]
+  },
 ];
 
 export const siswaNav = [
