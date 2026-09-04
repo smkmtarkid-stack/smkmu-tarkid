@@ -1,6 +1,8 @@
 import { LandingPageContent } from "./landing-content";
 import { fetchSheetCached } from "@/lib/api";
 
+export const revalidate = 0;
+
 export default async function Home() {
   // Fetch all necessary data concurrently with caching (60 seconds)
   const [
