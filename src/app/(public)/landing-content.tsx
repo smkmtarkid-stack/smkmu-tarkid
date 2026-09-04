@@ -16,10 +16,10 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { SectionTitle } from "@/components/common/section-title";
 import { siteConfig } from "@/constants/site";
-import { getDirectImageUrl } from "@/lib/utils";
+import { getDirectImageUrl, cn } from "@/lib/utils";
 
 interface LandingPageProps {
   sliders: any[];
@@ -113,12 +113,18 @@ export function LandingPageContent({
                 {activeSlider ? activeSlider.deskripsi : "Mencetak generasi muda yang berakhlak mulia, cerdas, terampil, dan siap bersaing di era digital."}
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button size="lg" className="bg-brand-secondary hover:bg-brand-secondary-dark text-white rounded-full px-8 h-14 text-base w-full sm:w-auto">
+                <Link 
+                  href="/ppdb" 
+                  className={cn(buttonVariants({ size: "lg" }), "bg-brand-secondary hover:bg-brand-secondary-dark text-white rounded-full px-8 h-14 text-base w-full sm:w-auto")}
+                >
                   {activeSlider && activeSlider.tombol ? activeSlider.tombol : "Daftar PPDB Sekarang"}
-                </Button>
-                <Button size="lg" variant="outline" className="rounded-full px-8 h-14 text-base w-full sm:w-auto border-white text-white hover:bg-white hover:text-brand-primary">
+                </Link>
+                <Link 
+                  href="/jurusan" 
+                  className={cn(buttonVariants({ size: "lg", variant: "outline" }), "bg-transparent border border-white text-white hover:bg-white hover:text-brand-primary rounded-full px-8 h-14 text-base w-full sm:w-auto")}
+                >
                   Jelajahi Jurusan
-                </Button>
+                </Link>
               </div>
             </motion.div>
           </AnimatePresence>
@@ -391,9 +397,12 @@ export function LandingPageContent({
           unoptimized
         />
         <div className="container-custom relative z-10 text-center">
-          <Button size="icon" className="w-20 h-20 rounded-full bg-brand-secondary hover:bg-brand-secondary-light text-white mb-8 mx-auto animate-pulse">
+          <Link 
+            href="/profil" 
+            className={cn(buttonVariants({ size: "icon" }), "w-20 h-20 rounded-full bg-brand-secondary hover:bg-brand-secondary-light text-white mb-8 mx-auto animate-pulse flex items-center justify-center")}
+          >
             <PlayCircle className="h-10 w-10" />
-          </Button>
+          </Link>
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Profil SMK Muhammadiyah</h2>
           <p className="text-white/80 max-w-2xl mx-auto text-lg">
             Saksikan video profil sekolah kami untuk mengenal lebih dekat lingkungan, fasilitas, dan kegiatan belajar mengajar.
@@ -410,12 +419,18 @@ export function LandingPageContent({
             Pendaftaran Peserta Didik Baru (PPDB) Tahun Ajaran Baru telah dibuka. Daftarkan diri Anda sekarang dan jadilah bagian dari generasi juara.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button size="lg" className="bg-white text-brand-primary hover:bg-white/90 rounded-full px-8 h-14 text-base">
+            <Link 
+              href="/ppdb" 
+              className={cn(buttonVariants({ size: "lg" }), "bg-white text-brand-primary hover:bg-white/90 rounded-full px-8 h-14 text-base flex items-center justify-center")}
+            >
               Daftar Sekarang
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 rounded-full px-8 h-14 text-base">
+            </Link>
+            <Link 
+              href="/ppdb" 
+              className={cn(buttonVariants({ size: "lg", variant: "outline" }), "bg-transparent border border-white text-white hover:bg-white/20 rounded-full px-8 h-14 text-base flex items-center justify-center")}
+            >
               Informasi PPDB
-            </Button>
+            </Link>
           </div>
         </div>
       </section>
