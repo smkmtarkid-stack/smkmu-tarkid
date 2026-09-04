@@ -77,6 +77,7 @@ export function LandingPageContent({
                   fill
                   className="object-cover opacity-70 mix-blend-overlay"
                   priority
+                  unoptimized={!activeSlider.gambar || activeSlider.gambar.includes("unsplash.com")}
                 />
               </motion.div>
             ) : (
@@ -86,6 +87,7 @@ export function LandingPageContent({
                 fill
                 className="object-cover opacity-60 mix-blend-overlay"
                 priority
+                unoptimized
               />
             )}
           </AnimatePresence>
@@ -178,6 +180,7 @@ export function LandingPageContent({
                 alt={sambutan?.keterangan || "Kepala Sekolah"}
                 fill
                 className="object-cover"
+                unoptimized={!sambutan?.gambar || sambutan.gambar.includes("unsplash.com")}
               />
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent z-20 text-white">
                 <h3 className="font-bold text-xl">{sambutan?.keterangan || siteConfig.school.headmaster}</h3>
@@ -385,6 +388,7 @@ export function LandingPageContent({
           alt="Video Background"
           fill
           className="object-cover opacity-40"
+          unoptimized
         />
         <div className="container-custom relative z-10 text-center">
           <Button size="icon" className="w-20 h-20 rounded-full bg-brand-secondary hover:bg-brand-secondary-light text-white mb-8 mx-auto animate-pulse">
