@@ -334,7 +334,7 @@ export default function AdminDashboardPage() {
                       boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                       fontSize: "12px",
                     }}
-                    formatter={(value: number) => [`${value} siswa`, "Jumlah"]}
+                    formatter={(value: any) => [`${value} siswa`, "Jumlah"]}
                   />
                   <Bar dataKey="jumlah" radius={[6, 6, 0, 0]} maxBarSize={45}>
                     {kelasChartData.map((_, index) => (
@@ -392,7 +392,7 @@ export default function AdminDashboardPage() {
                       boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                       fontSize: "12px",
                     }}
-                    formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, ""]}
+                    formatter={(value: any) => [`Rp ${value.toLocaleString("id-ID")}`, ""]}
                   />
                   <Legend
                     verticalAlign="bottom"

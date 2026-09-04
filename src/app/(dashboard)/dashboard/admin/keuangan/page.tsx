@@ -353,7 +353,7 @@ export default function KeuanganDashboardPage() {
                       boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                       fontSize: "12px",
                     }}
-                    formatter={(value: number) => [`Rp ${value.toLocaleString("id-ID")}`, "Pemasukan"]}
+                    formatter={(value: any) => [`Rp ${Number(value).toLocaleString("id-ID")}`, "Pemasukan"]}
                   />
                   <Bar dataKey="total" radius={[6, 6, 0, 0]} maxBarSize={50}>
                     {monthlyChartData.map((_, i) => (
