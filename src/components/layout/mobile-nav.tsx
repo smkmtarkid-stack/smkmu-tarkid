@@ -41,24 +41,26 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
     <AnimatePresence>
       {open && (
         <motion.div
-          key="mobile-nav-backdrop"
+          key="mobile-nav-container"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden"
-        />
-      )}
-      
-      {open && (
-        <motion.div
-          key="mobile-nav-panel"
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "100%" }}
-          transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="fixed top-0 right-0 bottom-0 z-50 w-[85%] max-w-sm bg-background shadow-2xl lg:hidden flex flex-col"
+          exit={{ opacity: 0, transition: { delay: 0.2 } }}
+          className="fixed inset-0 z-50 lg:hidden"
         >
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          
+          {/* Panel */}
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="absolute top-0 right-0 bottom-0 w-[85%] max-w-sm bg-background shadow-2xl flex flex-col"
+          >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
               <Link href="/" className="flex items-center gap-3" onClick={onClose}>
@@ -100,6 +102,8 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                           if (hasChildren) {
                             e.preventDefault();
                             setExpandedItem(isExpanded ? null : item.href);
+                          } else {
+                            onClose();
                           }
                         }}
                         className={cn(
@@ -136,6 +140,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                             <Link
                               key={child.href}
                               href={child.href}
+                              onClick={onClose}
                               className={cn(
                                 "block pl-14 pr-6 py-3 text-sm transition-colors",
                                 pathname === child.href
@@ -164,6 +169,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               </Link>
             </div>
           </motion.div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
