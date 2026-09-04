@@ -107,21 +107,21 @@ export const footerNavigation = {
 export const adminNav = [
   { label: "Dashboard", href: "/dashboard/admin", icon: "LayoutDashboard" },
   { label: "Manajemen Profil", href: "/dashboard/admin/profil", icon: "School" },
-  { label: "Jurusan", href: "/dashboard/admin/jurusan", icon: "BookOpen" },
-  { label: "Kelas & Rombel", href: "/dashboard/admin/kelas", icon: "School" },
   {
     label: "Data Administrasi",
     icon: "Database",
     children: [
+      { label: "Jurusan", href: "/dashboard/admin/jurusan", icon: "BookOpen" },
+      { label: "Kelas & Rombel", href: "/dashboard/admin/kelas", icon: "School" },
       { label: "Guru", href: "/dashboard/admin/guru", icon: "Users" },
       { label: "Tata Usaha & Staf", href: "/dashboard/admin/staff", icon: "UserCheck" },
       { label: "Data Siswa", href: "/dashboard/admin/siswa", icon: "Users" },
       { label: "Wali Siswa", href: "/dashboard/admin/wali-siswa", icon: "Users" },
       { label: "Data Alumni", href: "/dashboard/admin/alumni", icon: "GraduationCap" },
+      { label: "Keuangan & SPP", href: "/dashboard/admin/keuangan", icon: "Wallet" },
+      { label: "Proses Naik Kelas", href: "/dashboard/admin/keuangan/naik-kelas", icon: "ArrowUpCircle" },
     ]
   },
-  { label: "Keuangan & SPP", href: "/dashboard/admin/keuangan", icon: "Wallet" },
-  { label: "Proses Naik Kelas", href: "/dashboard/admin/keuangan/naik-kelas", icon: "ArrowUpCircle" },
   { label: "Berita", href: "/dashboard/admin/berita", icon: "FileText" },
   { label: "Pengumuman", href: "/dashboard/admin/pengumuman", icon: "Bell" },
   { label: "Agenda", href: "/dashboard/admin/agenda", icon: "Calendar" },
