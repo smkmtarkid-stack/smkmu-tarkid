@@ -100,7 +100,7 @@ export default function KeuanganDashboardPage() {
           metode_pembayaran,
           petugas,
           tanggal_bayar,
-          siswa (nama, nis, kelas)
+          id_siswa
         `)
         .gte("tanggal_bayar", startISO)
         .lte("tanggal_bayar", endISO)
@@ -108,7 +108,31 @@ export default function KeuanganDashboardPage() {
 
       if (error) throw error;
 
-      const rows = data || [];
+      let rows = data || [];
+
+      // Manual join untuk menghindari error schema cache jika FK belum terbentuk
+      if (rows.length > 0) {
+        const studentIds = [...new Set(rows.map((r: any) => r.id_siswa).filter(Boolean))];
+        if (studentIds.length > 0) {
+          const { data: studentsData } = await supabase
+            .from("siswa")
+            .select("id, nama, nis, kelas")
+            .in("id", studentIds);
+          
+          if (studentsData) {
+            const studentMap = studentsData.reduce((acc: any, curr: any) => {
+              acc[curr.id] = curr;
+              return acc;
+            }, {});
+            
+            rows = rows.map((r: any) => ({
+              ...r,
+              siswa: studentMap[r.id_siswa] || null
+            }));
+          }
+        }
+      }
+
       setLaporanData(rows);
 
       const total = rows.reduce((acc, curr) => acc + Number(curr.nominal_bayar), 0);
