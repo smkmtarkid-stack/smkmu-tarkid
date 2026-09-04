@@ -22,8 +22,11 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
 
   // Close on route change
   useEffect(() => {
-    onClose();
-  }, [pathname, onClose]);
+    if (open) {
+      onClose();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   // Prevent body scroll when open
   useEffect(() => {

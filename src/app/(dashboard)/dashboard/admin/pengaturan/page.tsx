@@ -259,6 +259,15 @@ export default function PengaturanPage() {
                 placeholder="https://youtube.com/..."
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="tiktok">TikTok URL</Label>
+              <Input
+                id="tiktok"
+                value={formData.tiktok}
+                onChange={(e) => setFormData({ ...formData, tiktok: e.target.value })}
+                placeholder="https://tiktok.com/@..."
+              />
+            </div>
           </div>
         </div>
       </div>
