@@ -220,14 +220,7 @@ export default function LoginPage() {
             </form>
           </Form>
 
-          <div className="mt-8 text-center text-sm text-muted-foreground">
-            <p>Contoh Akun Uji Coba:</p>
-            <div className="mt-2 flex flex-wrap justify-center gap-2">
-              <span className="px-2 py-1 bg-muted rounded text-xs font-mono">admin@smk.id</span>
-              <span className="px-2 py-1 bg-muted rounded text-xs font-mono">siswa@smk.id</span>
-              <span className="px-2 py-1 bg-muted rounded text-xs font-mono">alumni@smk.id</span>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

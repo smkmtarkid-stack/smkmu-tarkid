@@ -174,13 +174,13 @@ export function LandingPageContent({
             >
               <div className="absolute inset-0 bg-brand-primary/20 z-10 rounded-2xl" />
               <Image
-                src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop"
-                alt="Kepala Sekolah"
+                src={sambutan?.gambar ? getDirectImageUrl(sambutan.gambar) : "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974&auto=format&fit=crop"}
+                alt={sambutan?.keterangan || "Kepala Sekolah"}
                 fill
                 className="object-cover"
               />
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent z-20 text-white">
-                <h3 className="font-bold text-xl">{siteConfig.school.headmaster}</h3>
+                <h3 className="font-bold text-xl">{sambutan?.keterangan || siteConfig.school.headmaster}</h3>
                 <p className="text-brand-secondary">Kepala Sekolah</p>
               </div>
             </motion.div>

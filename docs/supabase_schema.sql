@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS public.profil (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     judul VARCHAR(255) NOT NULL,
     isi TEXT NOT NULL,
+    keterangan VARCHAR(255),
+    gambar TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
