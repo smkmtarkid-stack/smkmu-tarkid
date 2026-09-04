@@ -72,7 +72,7 @@ export function LandingPageContent({
                 className="absolute inset-0"
               >
                 <Image
-                  src={activeSlider.gambar ? getDirectImageUrl(activeSlider.gambar) : "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop"}
+                  src={activeSlider.gambar ? getDirectImageUrl(activeSlider.gambar) : "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070&auto=format&fit=crop"}
                   alt={activeSlider.judul || "Sekolah"}
                   fill
                   className="object-cover opacity-70 mix-blend-overlay"
@@ -82,7 +82,7 @@ export function LandingPageContent({
               </motion.div>
             ) : (
               <Image
-                src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop"
+                src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070&auto=format&fit=crop"
                 alt="Sekolah Default"
                 fill
                 className="object-cover opacity-60 mix-blend-overlay"

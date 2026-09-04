@@ -43,6 +43,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         <>
           {/* Backdrop */}
           <motion.div
+            key="mobile-nav-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -52,6 +53,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
 
           {/* Panel */}
           <motion.div
+            key="mobile-nav-panel"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
