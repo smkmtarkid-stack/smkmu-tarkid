@@ -4,7 +4,6 @@ import {
   Phone,
   Mail,
   MapPin,
-  ArrowUp,
 } from "lucide-react";
 import { siteConfig } from "@/constants/site";
 import { footerNavigation } from "@/constants/navigation";
@@ -94,7 +93,7 @@ export async function Footer() {
 
       <div className="container-custom pt-16 pb-8">
         {/* Main Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[1.1fr_0.9fr_0.9fr_1.2fr] lg:gap-12">
           {/* About */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-4">
@@ -103,6 +102,7 @@ export async function Footer() {
                   src={siteConfig.logo}
                   alt={siteConfig.name}
                   fill
+                  sizes="48px"
                   className="object-contain p-1"
                 />
               </div>
@@ -126,7 +126,7 @@ export async function Footer() {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-lg bg-white/10 hover:bg-brand-primary flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-secondary"
                     aria-label={label}
                   >
                     <Icon className="h-4 w-4" />

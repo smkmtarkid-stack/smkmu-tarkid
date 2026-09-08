@@ -28,10 +28,10 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          "fixed inset-x-0 top-0 z-50 border-b transition-all duration-300",
           isTransparent
-            ? "bg-transparent"
-            : "glass shadow-lg shadow-black/5"
+            ? "border-transparent bg-transparent"
+            : "border-border/70 bg-background/90 shadow-lg shadow-brand-accent/5 backdrop-blur-xl"
         )}
       >
         <div className="container-custom">
@@ -43,6 +43,7 @@ export function Navbar() {
                   src={siteConfig.logo}
                   alt={siteConfig.name}
                   fill
+                  sizes="48px"
                   className="object-contain"
                   priority
                 />
@@ -70,7 +71,7 @@ export function Navbar() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav className="hidden items-center gap-1 lg:flex" aria-label="Navigasi utama">
               {mainNavigation.map((item) => {
                 const isActive =
                   pathname === item.href ||
@@ -89,8 +90,12 @@ export function Navbar() {
                     <Link
                       href={item.href}
                       className={cn(
-                        "flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                        isTransparent
+                        "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+                        item.href === "/ppdb"
+                          ? isTransparent
+                            ? "bg-brand-secondary text-brand-accent shadow-sm hover:bg-brand-secondary-light"
+                            : "bg-brand-primary text-white shadow-sm hover:bg-brand-primary-dark"
+                          : isTransparent
                           ? isActive
                             ? "text-brand-secondary"
                             : "text-white/90 hover:text-white hover:bg-white/10"
@@ -159,13 +164,13 @@ export function Navbar() {
               {/* Login Button */}
               <Link href="/login" className="hidden sm:block">
                 <Button
-                  variant={isTransparent ? "outline" : "default"}
+                  variant="ghost"
                   size="sm"
                   className={cn(
-                    "rounded-full gap-2",
+                    "hidden gap-2 rounded-full sm:inline-flex",
                     isTransparent
-                      ? "border-white/30 text-white hover:bg-white/10"
-                      : "bg-brand-primary hover:bg-brand-primary-dark text-white"
+                      ? "text-white hover:bg-white/10"
+                      : "text-foreground hover:bg-accent"
                   )}
                 >
                   <LogIn className="h-4 w-4" />
@@ -178,6 +183,8 @@ export function Navbar() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setMobileOpen(true)}
+                aria-label="Buka menu navigasi"
+                aria-expanded={mobileOpen}
                 className={cn(
                   "lg:hidden rounded-full",
                   isTransparent ? "text-white hover:bg-white/10" : ""

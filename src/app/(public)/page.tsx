@@ -3,6 +3,13 @@ import { fetchSheetCached } from "@/lib/api";
 
 export const revalidate = 0;
 
+type ContentState = "success" | "empty" | "error";
+
+function getContentState(status: "success" | "error", data?: unknown[]) : ContentState {
+  if (status === "error") return "error";
+  return data && data.length > 0 ? "success" : "empty";
+}
+
 export default async function Home() {
   // Fetch all necessary data concurrently with caching (60 seconds)
   const [
@@ -13,7 +20,8 @@ export default async function Home() {
     agendaRes,
     siswaRes,
     guruRes,
-    prestasiRes
+     prestasiRes,
+     galeriRes
   ] = await Promise.all([
     fetchSheetCached("Slider", 60),
     fetchSheetCached("Profil", 60),
@@ -23,6 +31,7 @@ export default async function Home() {
     fetchSheetCached("Siswa", 60),
     fetchSheetCached("Guru", 60),
     fetchSheetCached("Prestasi", 60),
+    fetchSheetCached("Galeri", 60),
   ]);
 
   // Extract data arrays
@@ -31,6 +40,18 @@ export default async function Home() {
   const jurusanList = jurusanRes.data || [];
   const beritaList = beritaRes.data || [];
   const agendaList = agendaRes.data || [];
+  const prestasiList = prestasiRes.data ? [...prestasiRes.data].reverse().slice(0, 3) : [];
+  const galeriList = galeriRes.data ? [...galeriRes.data].slice(0, 6) : [];
+  const contentState = {
+    sliders: getContentState(sliderRes.status, sliders),
+    profil: getContentState(profilRes.status, profilData),
+    jurusan: getContentState(jurusanRes.status, jurusanList),
+    berita: getContentState(beritaRes.status, beritaList),
+    agenda: getContentState(agendaRes.status, agendaList),
+    prestasi: getContentState(prestasiRes.status, prestasiRes.data),
+    galeri: getContentState(galeriRes.status, galeriRes.data),
+    stats: [siswaRes, guruRes, prestasiRes].some((res) => res.status === "error") ? "error" as const : "success" as const,
+  };
 
   // Calculate statistics from data length
   const stats = {
@@ -42,7 +63,7 @@ export default async function Home() {
 
   // Find the 'Sambutan' section in Profil
   // Assuming there's a row where 'judul' contains 'Sambutan'
-  const sambutan = profilData.find((p: any) => 
+  const sambutan = profilData.find((p: { judul?: string }) =>
     p.judul && p.judul.toLowerCase().includes("sambutan")
   ) || null;
 
@@ -61,6 +82,9 @@ export default async function Home() {
       jurusanList={jurusanList}
       beritaList={latestBerita}
       agendaList={upcomingAgenda}
+      prestasiList={prestasiList}
+      galeriList={galeriList}
+      contentState={contentState}
     />
   );
 }

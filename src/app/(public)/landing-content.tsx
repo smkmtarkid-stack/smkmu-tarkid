@@ -14,25 +14,100 @@ import {
   Calendar,
   PlayCircle,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Medal,
+  ImageIcon
 } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { SectionTitle } from "@/components/common/section-title";
+import { Counter } from "@/components/common/counter";
+import { GalleryLightbox } from "@/components/common/gallery-lightbox";
+import { ProfileVideoModal } from "@/components/common/profile-video-modal";
+import { EmptyState } from "@/components/common/empty-state";
+import { ErrorState } from "@/components/common/error-state";
 import { siteConfig } from "@/constants/site";
 import { getDirectImageUrl, cn } from "@/lib/utils";
 
+interface SliderData {
+  id?: string | number;
+  judul?: string;
+  deskripsi?: string;
+  gambar?: string;
+  tombol?: string;
+}
+
+interface WelcomeData {
+  judul?: string;
+  isi?: string;
+  gambar?: string;
+  keterangan?: string;
+}
+
+interface DepartmentData {
+  id?: string | number;
+  nama?: string;
+  deskripsi?: string;
+  foto?: string;
+}
+
+interface NewsData {
+  id?: string | number;
+  judul?: string;
+  kategori?: string;
+  tanggal?: string;
+  isi?: string;
+  thumbnail?: string;
+}
+
+interface AgendaData {
+  id?: string | number;
+  tanggal?: string;
+  nama_kegiatan?: string;
+  tempat?: string;
+}
+
+interface AchievementData {
+  id?: string | number;
+  foto?: string;
+  prestasi?: string;
+  tingkat?: string;
+  tahun?: string | number;
+  nama?: string;
+}
+
+interface GalleryData {
+  id?: string | number;
+  gambar?: string;
+  deskripsi?: string;
+  kategori?: string;
+}
+
+type ContentState = "success" | "empty" | "error";
+
 interface LandingPageProps {
-  sliders: any[];
-  sambutan: any | null;
+  sliders: SliderData[];
+  sambutan: WelcomeData | null;
   stats: {
     siswa: number;
     guru: number;
     jurusan: number;
     prestasi: number;
   };
-  jurusanList: any[];
-  beritaList: any[];
-  agendaList: any[];
+  jurusanList: DepartmentData[];
+  beritaList: NewsData[];
+  agendaList: AgendaData[];
+  prestasiList: AchievementData[];
+  galeriList: GalleryData[];
+  contentState: {
+    sliders: ContentState;
+    profil: ContentState;
+    jurusan: ContentState;
+    berita: ContentState;
+    agenda: ContentState;
+    prestasi: ContentState;
+    galeri: ContentState;
+    stats: "success" | "error";
+  };
 }
 
 export function LandingPageContent({
@@ -41,9 +116,15 @@ export function LandingPageContent({
   stats,
   jurusanList,
   beritaList,
-  agendaList
+  agendaList,
+  prestasiList,
+  galeriList,
+  contentState
 }: LandingPageProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
+  const [videoOpen, setVideoOpen] = useState(false);
+  const profileVideoUrl = process.env.NEXT_PUBLIC_PROFILE_VIDEO_URL;
 
   useEffect(() => {
     if (!sliders || sliders.length <= 1) return;
@@ -58,7 +139,7 @@ export function LandingPageContent({
   return (
     <>
       {/* 1. Hero Section (Dynamic Slider) */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative flex min-h-[680px] items-center overflow-hidden py-28 lg:min-h-[760px]">
         <div className="absolute inset-0 bg-brand-primary">
           <div className="absolute inset-0 bg-black/50 z-10" />
           <AnimatePresence mode="wait">
@@ -77,6 +158,7 @@ export function LandingPageContent({
                   fill
                   className="object-cover opacity-70 mix-blend-overlay"
                   priority
+                  sizes="100vw"
                   unoptimized={!activeSlider.gambar || activeSlider.gambar.includes("unsplash.com")}
                 />
               </motion.div>
@@ -87,13 +169,14 @@ export function LandingPageContent({
                 fill
                 className="object-cover opacity-60 mix-blend-overlay"
                 priority
+                sizes="100vw"
                 unoptimized
               />
             )}
           </AnimatePresence>
         </div>
         
-        <div className="container-custom relative z-20 text-center text-white mt-16">
+        <div className="container-custom relative z-20 mt-16 w-full text-white">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeSlider ? activeSlider.id : "default"}
@@ -101,30 +184,47 @@ export function LandingPageContent({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -30 }}
               transition={{ duration: 0.8 }}
-              className="max-w-4xl mx-auto"
+              className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]"
             >
-              <span className="inline-block py-1 px-3 rounded-full bg-brand-secondary/20 border border-brand-secondary/50 text-brand-secondary font-medium mb-6 backdrop-blur-sm">
-                Penerimaan Peserta Didik Baru Telah Dibuka
-              </span>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                {activeSlider ? activeSlider.judul : <>Selamat Datang di <br /><span className="text-brand-secondary">SMK Muhammadiyah</span> Tarogong Kidul</>}
-              </h1>
-              <p className="text-lg md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto font-light">
-                {activeSlider ? activeSlider.deskripsi : "Mencetak generasi muda yang berakhlak mulia, cerdas, terampil, dan siap bersaing di era digital."}
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link 
-                  href="/ppdb" 
-                  className={cn(buttonVariants({ size: "lg" }), "bg-brand-secondary hover:bg-brand-secondary-dark text-white rounded-full px-8 h-14 text-base w-full sm:w-auto")}
-                >
-                  {activeSlider && activeSlider.tombol ? activeSlider.tombol : "Daftar PPDB Sekarang"}
-                </Link>
-                <Link 
-                  href="/jurusan" 
-                  className={cn(buttonVariants({ size: "lg", variant: "outline" }), "bg-transparent border border-white text-white hover:bg-white hover:text-brand-primary rounded-full px-8 h-14 text-base w-full sm:w-auto")}
-                >
-                  Jelajahi Jurusan
-                </Link>
+              <div className="max-w-3xl">
+                <span className="mb-6 inline-flex rounded-full border border-brand-secondary/50 bg-brand-secondary/20 px-3 py-1 text-sm font-medium text-brand-secondary backdrop-blur-sm">
+                  Penerimaan Peserta Didik Baru Telah Dibuka
+                </span>
+                <h1 className="mb-6 text-4xl font-bold leading-tight md:text-6xl lg:text-7xl">
+                  {activeSlider ? activeSlider.judul : <>Selamat Datang di <br /><span className="text-brand-secondary">SMK Muhammadiyah</span> Tarogong Kidul</>}
+                </h1>
+                <p className="mb-10 max-w-2xl text-lg font-light text-white/90 md:text-2xl">
+                  {activeSlider ? activeSlider.deskripsi : "Mencetak generasi muda yang berakhlak mulia, cerdas, terampil, dan siap bersaing di era digital."}
+                </p>
+                <div className="flex flex-col gap-4 sm:flex-row">
+                  <Link href="/ppdb" className={cn(buttonVariants({ size: "lg" }), "h-14 w-full rounded-full bg-brand-secondary px-8 text-base text-brand-accent hover:bg-brand-secondary-light sm:w-auto")}>
+                    {activeSlider?.tombol || "Daftar PPDB Sekarang"}
+                  </Link>
+                  <Link href="/jurusan" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "h-14 w-full rounded-full border-white bg-transparent px-8 text-base text-white hover:bg-white hover:text-brand-primary sm:w-auto")}>
+                    Jelajahi Jurusan
+                  </Link>
+                </div>
+                {contentState.sliders === "error" && (
+                  <p className="mt-5 text-sm text-white/70">Slider sedang tidak tersedia. Konten utama tetap dapat diakses.</p>
+                )}
+              </div>
+              <div className="relative hidden min-h-[360px] lg:block">
+                <div className="absolute inset-8 rounded-[2rem] border border-white/20 bg-white/10 backdrop-blur-sm" />
+                <div className="absolute inset-0 overflow-hidden rounded-[2rem] border border-white/30 shadow-2xl shadow-black/30">
+                  <Image
+                    src={activeSlider?.gambar ? getDirectImageUrl(activeSlider.gambar) : "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070&auto=format&fit=crop"}
+                    alt={activeSlider?.judul || "Kegiatan sekolah"}
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 42vw, 100vw"
+                    unoptimized={!activeSlider?.gambar || activeSlider.gambar.includes("unsplash.com")}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-accent/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <p className="text-sm font-medium uppercase tracking-[0.2em] text-brand-secondary">Modern Islamic School</p>
+                    <p className="mt-2 text-xl font-semibold text-white">Belajar, berkarya, dan berprestasi.</p>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </AnimatePresence>
@@ -134,13 +234,17 @@ export function LandingPageContent({
         {sliders && sliders.length > 1 && (
           <>
             <button 
+              type="button"
               onClick={() => setCurrentSlide(prev => prev === 0 ? sliders.length - 1 : prev - 1)}
+              aria-label="Slide sebelumnya"
               className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm transition-all"
             >
               <ChevronLeft className="h-8 w-8" />
             </button>
             <button 
+              type="button"
               onClick={() => setCurrentSlide(prev => prev === sliders.length - 1 ? 0 : prev + 1)}
+              aria-label="Slide berikutnya"
               className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm transition-all"
             >
               <ChevronRight className="h-8 w-8" />
@@ -148,8 +252,11 @@ export function LandingPageContent({
             <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-30 flex gap-2">
               {sliders.map((_, idx) => (
                 <button
+                  type="button"
                   key={idx}
                   onClick={() => setCurrentSlide(idx)}
+                  aria-label={`Buka slide ${idx + 1}`}
+                  aria-current={idx === currentSlide ? "true" : undefined}
                   className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentSlide ? "bg-brand-secondary w-8" : "bg-white/50"}`}
                 />
               ))}
@@ -186,6 +293,7 @@ export function LandingPageContent({
                 alt={sambutan?.keterangan || "Kepala Sekolah"}
                 fill
                 className="object-cover"
+                sizes="(min-width: 1024px) 40vw, 100vw"
                 unoptimized={!sambutan?.gambar || sambutan.gambar.includes("unsplash.com")}
               />
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent z-20 text-white">
@@ -201,20 +309,22 @@ export function LandingPageContent({
               transition={{ duration: 0.6 }}
             >
               <SectionTitle 
-                title={sambutan ? sambutan.judul : "Sambutan Kepala Sekolah"} 
+                title={sambutan?.judul || "Sambutan Kepala Sekolah"}
                 center={false}
                 subtitle="Assalamu'alaikum Warahmatullahi Wabarakatuh"
                 className="mb-6"
               />
               <div className="prose prose-lg text-muted-foreground mb-8 whitespace-pre-wrap">
-                {sambutan ? (
+                {contentState.profil === "error" ? (
+                  <ErrorState title="Sambutan belum dapat dimuat" className="mb-0" />
+                ) : sambutan ? (
                   <p>{sambutan.isi}</p>
                 ) : (
-                  <>
-                    <p>Puji syukur kita panjatkan ke hadirat Allah SWT. Selamat datang di website resmi SMK Muhammadiyah Tarogong Kidul.</p>
-                    <p>Di era digital yang berkembang pesat ini, kami berkomitmen untuk tidak hanya membekali siswa dengan kompetensi keahlian yang mumpuni, tetapi juga karakter islami yang kuat berlandaskan nilai-nilai Kemuhammadiyahan.</p>
-                    <p>Mari bergabung bersama kami menjadi bagian dari generasi cerdas, mandiri, dan berakhlak mulia.</p>
-                  </>
+                  <EmptyState
+                    title="Sambutan belum tersedia"
+                    description="Informasi sambutan kepala sekolah akan ditampilkan setelah tersedia."
+                    className="min-h-40"
+                  />
                 )}
               </div>
             </motion.div>
@@ -226,12 +336,12 @@ export function LandingPageContent({
       <section className="py-16 bg-brand-primary text-white relative">
         <div className="absolute inset-0 pattern-overlay opacity-10" />
         <div className="container-custom relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/20">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
             {[
-              { label: "Siswa Aktif", value: stats.siswa + "+", icon: Users },
-              { label: "Tenaga Pendidik", value: stats.guru + "+", icon: Briefcase },
-              { label: "Kompetensi Keahlian", value: stats.jurusan, icon: BookOpen },
-              { label: "Prestasi", value: stats.prestasi + "+", icon: Trophy },
+              { label: "Siswa Aktif", value: stats.siswa, suffix: "+", icon: Users },
+              { label: "Tenaga Pendidik", value: stats.guru, suffix: "+", icon: Briefcase },
+              { label: "Kompetensi Keahlian", value: stats.jurusan, suffix: "", icon: BookOpen },
+              { label: "Prestasi", value: stats.prestasi, suffix: "+", icon: Trophy },
             ].map((stat, i) => (
               <motion.div 
                 key={i}
@@ -239,10 +349,12 @@ export function LandingPageContent({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="text-center px-4"
+                className="rounded-2xl border border-white/10 bg-white/5 px-3 py-6 text-center backdrop-blur-sm md:px-4"
               >
                 <stat.icon className="h-8 w-8 mx-auto mb-4 text-brand-secondary opacity-80" />
-                <h3 className="text-4xl md:text-5xl font-bold mb-2">{stat.value}</h3>
+                <h3 className="text-4xl md:text-5xl font-bold mb-2">
+                  {contentState.stats === "error" ? "-" : <Counter value={stat.value} suffix={stat.suffix} />}
+                </h3>
                 <p className="text-white/80 text-sm md:text-base">{stat.label}</p>
               </motion.div>
             ))}
@@ -259,7 +371,9 @@ export function LandingPageContent({
           />
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {jurusanList && jurusanList.length > 0 ? (
+            {contentState.jurusan === "error" ? (
+              <ErrorState title="Data jurusan belum dapat dimuat" className="col-span-full" />
+            ) : jurusanList.length > 0 ? (
               jurusanList.map((dept, i) => (
                 <motion.div
                   key={dept.id || i}
@@ -271,7 +385,7 @@ export function LandingPageContent({
                 >
                   <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 bg-brand-primary/10 text-brand-primary overflow-hidden relative">
                     {dept.foto ? (
-                      <Image src={getDirectImageUrl(dept.foto)} alt={dept.nama} fill className="object-cover" />
+                      <Image src={getDirectImageUrl(dept.foto)} alt={dept.nama || "Kompetensi keahlian"} fill sizes="56px" className="object-cover" />
                     ) : (
                       <BookOpen className="h-6 w-6" />
                     )}
@@ -286,7 +400,7 @@ export function LandingPageContent({
                 </motion.div>
               ))
             ) : (
-              <div className="col-span-full text-center text-muted-foreground py-10">Data jurusan belum tersedia.</div>
+              <EmptyState title="Data jurusan belum tersedia" description="Program kompetensi akan ditampilkan setelah data tersedia." className="col-span-full" />
             )}
           </div>
         </div>
@@ -306,15 +420,18 @@ export function LandingPageContent({
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {beritaList && beritaList.length > 0 ? (
+                {contentState.berita === "error" ? (
+                  <ErrorState title="Berita belum dapat dimuat" className="col-span-full" />
+                ) : beritaList.length > 0 ? (
                   beritaList.map((berita, i) => (
                     <div key={berita.id || i} className="group rounded-2xl overflow-hidden border bg-card">
                       <div className="relative h-48 overflow-hidden bg-muted">
                         {berita.thumbnail ? (
                           <Image
                             src={getDirectImageUrl(berita.thumbnail)}
-                            alt={berita.judul}
+                            alt={berita.judul || "Berita sekolah"}
                             fill
+                            sizes="(min-width: 768px) 28rem, 100vw"
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
@@ -342,7 +459,7 @@ export function LandingPageContent({
                     </div>
                   ))
                 ) : (
-                  <div className="col-span-full text-muted-foreground">Belum ada berita terbaru.</div>
+                  <EmptyState title="Belum ada berita terbaru" description="Informasi terbaru sekolah akan ditampilkan di sini." className="col-span-full" />
                 )}
               </div>
             </div>
@@ -357,11 +474,13 @@ export function LandingPageContent({
               </div>
               
               <div className="space-y-4">
-                {agendaList && agendaList.length > 0 ? (
+                {contentState.agenda === "error" ? (
+                  <ErrorState title="Agenda belum dapat dimuat" />
+                ) : agendaList.length > 0 ? (
                   agendaList.map((agenda, i) => {
-                    const dateObj = new Date(agenda.tanggal);
-                    const day = dateObj.getDate() || "-";
-                    const month = dateObj.toLocaleString('id-ID', { month: 'short' }) || "-";
+                    const dateObj = agenda.tanggal ? new Date(agenda.tanggal) : null;
+                    const day = dateObj?.getDate() || "-";
+                    const month = dateObj?.toLocaleString('id-ID', { month: 'short' }) || "-";
 
                     return (
                       <div key={agenda.id || i} className="flex gap-4 p-4 rounded-xl border bg-muted/30 hover:bg-muted/50 transition-colors">
@@ -379,7 +498,7 @@ export function LandingPageContent({
                     )
                   })
                 ) : (
-                  <div className="text-muted-foreground">Belum ada agenda terdekat.</div>
+                  <EmptyState title="Belum ada agenda terdekat" description="Jadwal kegiatan sekolah akan ditampilkan di sini." />
                 )}
               </div>
             </div>
@@ -387,22 +506,88 @@ export function LandingPageContent({
         </div>
       </section>
 
-      {/* 6. Video Section */}
-      <section className="relative py-24 bg-black overflow-hidden">
+      {/* 6. Achievements (Dynamic) */}
+      <section className="section-padding bg-muted/30">
+        <div className="container-custom">
+          <SectionTitle
+            title="Prestasi Membanggakan"
+            subtitle="Pencapaian siswa dan sekolah yang menjadi bagian dari perjalanan kami."
+          />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {contentState.prestasi === "error" ? (
+              <ErrorState title="Prestasi belum dapat dimuat" className="col-span-full" />
+            ) : prestasiList.length > 0 ? prestasiList.map((item, i) => (
+              <motion.article
+                key={item.id || i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              >
+                <div className="relative h-52 overflow-hidden bg-muted">
+                  {item.foto ? (
+                    <Image src={getDirectImageUrl(item.foto)} alt={item.prestasi || "Prestasi sekolah"} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-brand-primary/10 to-brand-secondary/20"><Trophy className="h-14 w-14 text-brand-secondary/60" /></div>
+                  )}
+                </div>
+                <div className="p-5">
+                  <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-brand-secondary-dark dark:text-brand-secondary">
+                    <Medal className="h-4 w-4" /> {item.tingkat || "Prestasi"} {item.tahun ? `• ${item.tahun}` : ""}
+                  </div>
+                  <h3 className="line-clamp-2 text-lg font-bold transition-colors group-hover:text-brand-primary">{item.prestasi || "Prestasi sekolah"}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{item.nama || "Siswa SMK Muhammadiyah Tarogong Kidul"}</p>
+                </div>
+              </motion.article>
+            )) : (
+              <EmptyState title="Data prestasi belum tersedia" description="Pencapaian siswa dan sekolah akan tampil setelah data tersedia." className="col-span-full" />
+            )}
+          </div>
+          <div className="mt-8 text-center"><Link href="/prestasi" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-primary hover:underline">Lihat semua prestasi <ArrowRight className="h-4 w-4" /></Link></div>
+        </div>
+      </section>
+
+      {/* 7. Gallery (Dynamic) */}
+      <section className="section-padding bg-background">
+        <div className="container-custom">
+          <SectionTitle title="Momen di Sekolah" subtitle="Lihat berbagai kegiatan dan momen berharga dari keluarga besar SMK Muhammadiyah." />
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
+            {contentState.galeri === "error" ? (
+              <ErrorState title="Galeri belum dapat dimuat" className="col-span-full" />
+            ) : galeriList.length > 0 ? galeriList.map((item, i) => (
+              <button type="button" key={item.id || i} onClick={() => setSelectedGalleryIndex(i)} className={cn("group relative block w-full overflow-hidden rounded-2xl bg-muted text-left", i === 0 ? "col-span-2 row-span-2 aspect-square" : "aspect-[4/3]")} aria-label={`Buka foto ${item.deskripsi || item.kategori || "galeri sekolah"}`}>
+                {item.gambar ? <Image src={getDirectImageUrl(item.gambar)} alt={item.deskripsi || "Galeri sekolah"} fill sizes="(min-width: 768px) 33vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-110" /> : <div className="flex h-full items-center justify-center"><ImageIcon className="h-10 w-10 text-brand-primary/30" /></div>}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <span className="absolute bottom-4 left-4 right-4 line-clamp-2 text-sm font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">{item.deskripsi || item.kategori || "Lihat galeri"}</span>
+              </button>
+            )) : (
+              <EmptyState title="Galeri foto belum tersedia" description="Dokumentasi kegiatan sekolah akan ditampilkan setelah data tersedia." className="col-span-full" />
+            )}
+          </div>
+          <div className="mt-8 text-center"><Link href="/galeri" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-primary hover:underline">Lihat semua galeri <ArrowRight className="h-4 w-4" /></Link></div>
+        </div>
+      </section>
+
+      {/* 8. Video Section */}
+      <section className="relative overflow-hidden bg-brand-accent py-24">
         <Image
           src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2070&auto=format&fit=crop"
           alt="Video Background"
           fill
           className="object-cover opacity-40"
           unoptimized
+          sizes="100vw"
         />
         <div className="container-custom relative z-10 text-center">
-          <Link 
-            href="/profil" 
-            className={cn(buttonVariants({ size: "icon" }), "w-20 h-20 rounded-full bg-brand-secondary hover:bg-brand-secondary-light text-white mb-8 mx-auto animate-pulse flex items-center justify-center")}
+          <button
+            type="button"
+            onClick={() => setVideoOpen(true)}
+            className={cn(buttonVariants({ size: "icon" }), "mx-auto mb-8 flex h-20 w-20 animate-pulse items-center justify-center rounded-full bg-brand-secondary text-white hover:bg-brand-secondary-light")}
+            aria-label="Buka video profil sekolah"
           >
             <PlayCircle className="h-10 w-10" />
-          </Link>
+          </button>
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Profil SMK Muhammadiyah</h2>
           <p className="text-white/80 max-w-2xl mx-auto text-lg">
             Saksikan video profil sekolah kami untuk mengenal lebih dekat lingkungan, fasilitas, dan kegiatan belajar mengajar.
@@ -410,7 +595,7 @@ export function LandingPageContent({
         </div>
       </section>
 
-      {/* 7. CTA / PPDB */}
+      {/* 9. CTA / PPDB */}
       <section className="section-padding gradient-primary text-white">
         <div className="container-custom text-center">
           <GraduationCap className="h-16 w-16 mx-auto mb-6 text-brand-secondary" />
@@ -434,6 +619,17 @@ export function LandingPageContent({
           </div>
         </div>
       </section>
+      <GalleryLightbox
+        items={galeriList}
+        selectedIndex={selectedGalleryIndex}
+        onClose={() => setSelectedGalleryIndex(null)}
+        onNavigate={setSelectedGalleryIndex}
+      />
+      <ProfileVideoModal
+        open={videoOpen}
+        onClose={() => setVideoOpen(false)}
+        videoUrl={profileVideoUrl}
+      />
     </>
   );
 }

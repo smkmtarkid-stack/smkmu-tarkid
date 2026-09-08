@@ -40,11 +40,25 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
   return (
     <AnimatePresence>
       {open && (
         <motion.div
           key="mobile-nav-container"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu navigasi mobile"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { delay: 0.2 } }}
@@ -62,7 +76,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="absolute top-0 right-0 bottom-0 w-[85%] max-w-sm bg-background shadow-2xl flex flex-col"
+            className="absolute inset-y-0 right-0 flex w-[min(88%,24rem)] flex-col bg-background shadow-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
@@ -72,6 +86,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                     src={siteConfig.logo}
                     alt={siteConfig.name}
                     fill
+                    sizes="32px"
                     className="object-contain"
                   />
                 </div>
@@ -81,6 +96,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
+                aria-label="Tutup menu navigasi"
                 className="rounded-full"
               >
                 <X className="h-5 w-5" />
@@ -88,7 +104,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto py-4">
+            <nav className="flex-1 overflow-y-auto py-4" aria-label="Navigasi utama">
               {mainNavigation.map((item) => {
                 const isActive =
                   pathname === item.href ||
@@ -110,10 +126,12 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                           }
                         }}
                         className={cn(
-                          "flex-1 flex items-center gap-3 px-6 py-3.5 text-sm font-medium transition-colors",
-                          isActive
-                            ? "text-brand-primary bg-brand-primary/5"
-                            : "text-foreground/80 hover:text-foreground hover:bg-accent"
+                          "flex min-h-12 flex-1 items-center gap-3 px-6 py-3.5 text-sm font-medium transition-colors",
+                          item.href === "/ppdb"
+                            ? "mx-4 my-1 rounded-xl bg-brand-primary text-white hover:bg-brand-primary-dark"
+                            : isActive
+                              ? "text-brand-primary bg-brand-primary/5"
+                              : "text-foreground/80 hover:text-foreground hover:bg-accent"
                         )}
                       >
                         {item.icon && <item.icon className="h-4 w-4" />}
@@ -165,7 +183,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             {/* Footer */}
             <div className="p-4 border-t">
               <Link href="/login" onClick={onClose}>
-                <Button className="w-full gap-2 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-full">
+                <Button className="w-full gap-2 rounded-full bg-brand-accent text-white hover:bg-brand-accent-light">
                   <LogIn className="h-4 w-4" />
                   Login
                 </Button>
