@@ -15,15 +15,15 @@
   --font-mono: var(--font-geist-mono);
 
   /* Brand Colors */
-  --color-brand-primary: #006B5E;
-  --color-brand-primary-light: #008F7A;
-  --color-brand-primary-dark: #004D43;
-  --color-brand-secondary: #D4A843;
-  --color-brand-secondary-light: #E4C06A;
-  --color-brand-secondary-dark: #B08A2E;
-  --color-brand-accent: #1E3A5F;
-  --color-brand-accent-light: #2A5080;
-  --color-brand-accent-dark: #142840;
+  --color-brand-primary: #075985;
+  --color-brand-primary-light: #0E7490;
+  --color-brand-primary-dark: #0C4A6E;
+  --color-brand-secondary: #D6A84F;
+  --color-brand-secondary-light: #E8C875;
+  --color-brand-secondary-dark: #A97820;
+  --color-brand-accent: #12304A;
+  --color-brand-accent-light: #1D4B6E;
+  --color-brand-accent-dark: #0B2032;
 
   /* shadcn theme mapping */
   --color-background: var(--background);
@@ -83,7 +83,7 @@
   --popover: #ffffff;
   --popover-foreground: #0f172a;
 
-  --primary: #006B5E;
+  --primary: #075985;
   --primary-foreground: #ffffff;
 
   --secondary: #f1f5f9;
@@ -92,29 +92,29 @@
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
 
-  --accent: #f0fdf4;
-  --accent-foreground: #004D43;
+  --accent: #eff6ff;
+  --accent-foreground: #0C4A6E;
 
   --destructive: #ef4444;
 
   --border: #e2e8f0;
   --input: #e2e8f0;
-  --ring: #006B5E;
+  --ring: #075985;
 
-  --chart-1: #006B5E;
-  --chart-2: #D4A843;
-  --chart-3: #1E3A5F;
+  --chart-1: #075985;
+  --chart-2: #D6A84F;
+  --chart-3: #12304A;
   --chart-4: #10b981;
   --chart-5: #f59e0b;
 
   --sidebar: #fafafa;
   --sidebar-foreground: #0f172a;
-  --sidebar-primary: #006B5E;
+  --sidebar-primary: #075985;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f0fdf4;
-  --sidebar-accent-foreground: #004D43;
+  --sidebar-accent: #eff6ff;
+  --sidebar-accent-foreground: #0C4A6E;
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #006B5E;
+  --sidebar-ring: #075985;
 }
 
 /* ========================================
@@ -130,7 +130,7 @@
   --popover: #131c31;
   --popover-foreground: #e2e8f0;
 
-  --primary: #10b981;
+  --primary: #38A3D1;
   --primary-foreground: #0c1222;
 
   --secondary: #1e293b;
@@ -139,29 +139,29 @@
   --muted: #1e293b;
   --muted-foreground: #94a3b8;
 
-  --accent: #1a2e1e;
-  --accent-foreground: #34d399;
+  --accent: #12293D;
+  --accent-foreground: #8ED4F2;
 
   --destructive: #f87171;
 
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.12);
-  --ring: #10b981;
+  --ring: #38A3D1;
 
-  --chart-1: #10b981;
-  --chart-2: #E4C06A;
-  --chart-3: #60a5fa;
-  --chart-4: #34d399;
+  --chart-1: #38A3D1;
+  --chart-2: #E8C875;
+  --chart-3: #60A5FA;
+  --chart-4: #8ED4F2;
   --chart-5: #fbbf24;
 
   --sidebar: #131c31;
   --sidebar-foreground: #e2e8f0;
-  --sidebar-primary: #10b981;
+  --sidebar-primary: #38A3D1;
   --sidebar-primary-foreground: #0c1222;
-  --sidebar-accent: #1a2e1e;
-  --sidebar-accent-foreground: #34d399;
+  --sidebar-accent: #12293D;
+  --sidebar-accent-foreground: #8ED4F2;
   --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #10b981;
+  --sidebar-ring: #38A3D1;
 }
 
 /* ========================================
@@ -179,6 +179,10 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -240,7 +244,7 @@
 
   /* Section padding */
   .section-padding {
-    @apply py-16 md:py-20 lg:py-24;
+    @apply py-14 md:py-20 lg:py-28;
   }
 
   /* Gradient text */
@@ -266,8 +270,26 @@
     @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
   }
 
+  .surface-card {
+    @apply rounded-2xl border border-border/70 bg-card shadow-sm;
+  }
+
   /* Pattern overlay */
   .pattern-overlay {
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

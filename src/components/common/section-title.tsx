@@ -24,11 +24,11 @@ export function SectionTitle({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5 }}
-      className={cn(center && "text-center", "mb-12 lg:mb-16", className)}
+      className={cn(center && "text-center", "mb-10 lg:mb-14", className)}
     >
       <h2
         className={cn(
-          "text-3xl md:text-4xl font-bold mb-4",
+          "text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4",
           light ? "text-white" : "text-foreground"
         )}
       >
@@ -38,7 +38,7 @@ export function SectionTitle({
       {/* Decorative line */}
       <div
         className={cn(
-          "flex items-center gap-2 mb-4",
+          "flex items-center gap-2 mb-5",
           center && "justify-center"
         )}
       >
