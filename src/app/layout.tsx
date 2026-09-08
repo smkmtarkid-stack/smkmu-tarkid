@@ -50,9 +50,9 @@ export const metadata: Metadata = {
     creator: "@smkmutarkid",
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
   metadataBase: new URL(siteConfig.url),
 };

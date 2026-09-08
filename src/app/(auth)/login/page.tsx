@@ -90,7 +90,7 @@ export default function LoginPage() {
           }
         }
       }
-    } catch (error) {
+    } catch {
       toast.error("Terjadi kesalahan pada sistem.");
     } finally {
       setIsLoading(false);
@@ -98,7 +98,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen pt-16 lg:pt-20 flex bg-muted/30">
+    <div className="min-h-screen flex bg-muted/30">
       {/* Left Column: Image/Branding (Hidden on Mobile) */}
       <div className="hidden lg:flex w-1/2 relative bg-brand-primary items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-black/40 z-10" />
