@@ -64,6 +64,29 @@ create table if not exists public.audit_keuangan (
   data_baru jsonb
 );
 
+-- Operational expenses are separate from student payments. Never record a
+-- payment here: cash-in always comes from transaksi_pembayaran.
+create table if not exists public.pengeluaran_keuangan (
+  id uuid primary key default gen_random_uuid(),
+  tanggal timestamptz not null default now(),
+  kategori text not null,
+  deskripsi text not null,
+  nominal numeric not null check (nominal > 0),
+  metode_pembayaran text not null default 'CASH',
+  status text not null default 'active' check (status in ('active', 'void')),
+  alasan_void text,
+  dibuat_oleh text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.pengeluaran_keuangan enable row level security;
+drop policy if exists pengeluaran_keuangan_admin_manage on public.pengeluaran_keuangan;
+create policy pengeluaran_keuangan_admin_manage on public.pengeluaran_keuangan
+for all to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
 alter table public.audit_keuangan enable row level security;
 drop policy if exists audit_keuangan_admin_read on public.audit_keuangan;
 create policy audit_keuangan_admin_read on public.audit_keuangan
@@ -100,6 +123,11 @@ for each row execute function public.audit_keuangan_perubahan();
 drop trigger if exists audit_transaksi_pembayaran on public.transaksi_pembayaran;
 create trigger audit_transaksi_pembayaran
 after insert or update or delete on public.transaksi_pembayaran
+for each row execute function public.audit_keuangan_perubahan();
+
+drop trigger if exists audit_pengeluaran_keuangan on public.pengeluaran_keuangan;
+create trigger audit_pengeluaran_keuangan
+after insert or update or delete on public.pengeluaran_keuangan
 for each row execute function public.audit_keuangan_perubahan();
 
 -- Processes a full payment or voucher in one transaction. Row locks eliminate

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Wallet, Users, ReceiptText, ArrowUpRight, Loader2, Settings2, FileDown, CalendarDays, Search } from "lucide-react";
+import { Wallet, Users, ReceiptText, ArrowUpRight, ArrowDownRight, Loader2, Settings2, FileDown, CalendarDays, Search, WalletCards } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,8 @@ export default function KeuanganDashboardPage() {
   const [pemasukanHariIni, setPemasukanHariIni] = useState(0);
   const [totalTransaksiHariIni, setTotalTransaksiHariIni] = useState(0);
   const [totalTunggakan, setTotalTunggakan] = useState(0);
+  const [totalPengeluaran, setTotalPengeluaran] = useState(0);
+  const [saldoKas, setSaldoKas] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   // Laporan States
@@ -60,6 +62,22 @@ export default function KeuanganDashboardPage() {
         const totalPemasukan = transaksiData.reduce((acc, curr) => acc + Number(curr.nominal_bayar), 0);
         setPemasukanHariIni(totalPemasukan);
         setTotalTransaksiHariIni(transaksiData.length);
+      }
+
+      const { data: pengeluaranData, error: pengeluaranError } = await supabase
+        .from("pengeluaran_keuangan")
+        .select("nominal")
+        .eq("status", "active");
+
+      const { data: semuaPemasukanData, error: semuaPemasukanError } = await supabase
+        .from("transaksi_pembayaran")
+        .select("nominal_bayar");
+
+      if (!pengeluaranError && !semuaPemasukanError && pengeluaranData && semuaPemasukanData) {
+        const total = pengeluaranData.reduce((acc, curr) => acc + Number(curr.nominal), 0);
+        const totalPemasukan = semuaPemasukanData.reduce((acc, curr) => acc + Number(curr.nominal_bayar), 0);
+        setTotalPengeluaran(total);
+        setSaldoKas(totalPemasukan - total);
       }
 
       // 2. Hitung Total Tunggakan (tagihan belum lunas)
@@ -267,6 +285,26 @@ export default function KeuanganDashboardPage() {
                 </p>
               </>
             )}
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Pengeluaran</CardTitle>
+            <div className="p-2 bg-rose-100 dark:bg-rose-900/30 rounded-lg"><ArrowDownRight className="h-4 w-4 text-rose-600" /></div>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? <Loader2 className="h-6 w-6 animate-spin text-rose-600" /> : <><div className="text-2xl font-bold text-rose-600">Rp {totalPengeluaran.toLocaleString("id-ID")}</div><p className="text-xs text-muted-foreground mt-1">Akumulasi kas keluar aktif</p></>}
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Saldo Kas Tersisa</CardTitle>
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg"><WalletCards className="h-4 w-4 text-blue-600" /></div>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? <Loader2 className="h-6 w-6 animate-spin text-blue-600" /> : <><div className={`text-2xl font-bold ${saldoKas >= 0 ? "text-blue-600" : "text-rose-600"}`}>Rp {saldoKas.toLocaleString("id-ID")}</div><p className="text-xs text-muted-foreground mt-1">Pemasukan total dikurangi pengeluaran</p></>}
           </CardContent>
         </Card>
 
@@ -485,6 +523,11 @@ export default function KeuanganDashboardPage() {
                 <h4 className="font-semibold text-emerald-950 dark:text-emerald-50">Manajemen Tagihan Siswa</h4>
                 <p className="text-sm text-muted-foreground">Generate tagihan bulanan atau insidental ke siswa.</p>
               </div>
+            </Link>
+
+            <Link href="/dashboard/admin/keuangan/pengeluaran" className="flex items-center gap-4 p-4 rounded-xl border border-rose-100 hover:border-rose-500 hover:bg-rose-50/50 transition-all group">
+              <div className="bg-rose-100 p-3 rounded-lg group-hover:bg-rose-600 group-hover:text-white transition-colors"><WalletCards className="w-5 h-5 text-rose-600 group-hover:text-white" /></div>
+              <div><h4 className="font-semibold text-rose-950 dark:text-rose-50">Pengeluaran & Buku Kas</h4><p className="text-sm text-muted-foreground">Catat kas keluar dan lihat pemasukan, pengeluaran, serta saldo.</p></div>
             </Link>
 
             <Link href="/dashboard/admin/keuangan/naik-kelas" className="flex items-center gap-4 p-4 rounded-xl border border-blue-100 hover:border-blue-500 hover:bg-blue-50/50 transition-all group">
