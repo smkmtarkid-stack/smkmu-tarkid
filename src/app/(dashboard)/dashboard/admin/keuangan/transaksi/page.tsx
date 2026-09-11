@@ -106,34 +106,18 @@ export default function KasirPage() {
     
     setIsProcessing(true);
     try {
-      const billIds = selectedBills.map(b => b.id);
+      const billIds = selectedBills.map((bill) => bill.id);
+      const { data: paymentData, error: paymentError } = await supabase.rpc(
+        "proses_pembayaran_tagihan",
+        { p_tagihan_ids: billIds, p_metode_pembayaran: "CASH" }
+      );
 
-      // 1. Update semua tagihan terpilih jadi lunas
-      const { error: updateError } = await supabase
-        .from("tagihan_siswa")
-        .update({ status_lunas: true })
-        .in("id", billIds);
-
-      if (updateError) throw updateError;
-
-      // 2. Insert log transaksi untuk masing-masing tagihan
-      const transactions = selectedBills.map(bill => ({
-        id_tagihan: bill.id,
-        id_siswa: student.id,
-        nominal_bayar: bill.nominal,
-        metode_pembayaran: "CASH",
-        petugas: "Admin TU" // Harus disesuaikan dengan session auth nantinya
-      }));
-
-      const { data: insertData, error: insertError } = await supabase
-        .from("transaksi_pembayaran")
-        .insert(transactions)
-        .select("id");
-
-      if (insertError) throw insertError;
+      if (paymentError) throw paymentError;
 
       // Gabungkan ID dengan koma untuk URL struk jika banyak transaksi
-      const joinedIds = (insertData || []).map(t => t.id).join(",");
+      const joinedIds = ((paymentData || []) as { id_transaksi: string }[])
+        .map((transaction) => transaction.id_transaksi)
+        .join(",");
       setLastTxId(joinedIds || billIds.join(","));
       
       setPaymentSuccess(true);

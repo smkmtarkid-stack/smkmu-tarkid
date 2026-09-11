@@ -392,21 +392,12 @@ export default function TagihanSiswaPage() {
     if (!window.confirm("Tandai tagihan ini LUNAS secara GRATIS (Voucher/Beasiswa)? Pemasukan kasir tidak akan bertambah.")) return;
     
     try {
-      const { error: updateError } = await supabase
-        .from("tagihan_siswa")
-        .update({ status_lunas: true })
-        .eq("id", bill.id);
-        
-      if (updateError) throw updateError;
-      
-      // Catat sebagai transaksi 0 rupiah agar ada riwayatnya
-      await supabase.from("transaksi_pembayaran").insert({
-        id_tagihan: bill.id,
-        id_siswa: selectedStudentForEdit.id,
-        nominal_bayar: 0,
-        metode_pembayaran: "VOUCHER",
-        petugas: "Admin TU"
-      });
+      const { error: paymentError } = await supabase.rpc(
+        "proses_pembayaran_tagihan",
+        { p_tagihan_ids: [bill.id], p_metode_pembayaran: "VOUCHER" }
+      );
+
+      if (paymentError) throw paymentError;
       
       toast.success("Tagihan berhasil dilunaskan via Voucher!");
       
