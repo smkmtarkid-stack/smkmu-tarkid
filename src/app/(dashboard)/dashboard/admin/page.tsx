@@ -34,6 +34,27 @@ import {
   Legend,
 } from "recharts";
 
+type RecentActivity = {
+  title: string;
+  category: string;
+  time: string;
+  occurredAt?: string;
+};
+
+type FinanceAudit = {
+  terjadi_pada: string;
+  aksi: "INSERT" | "UPDATE" | "DELETE";
+  nama_tabel: "tagihan_siswa" | "transaksi_pembayaran";
+  data_baru: { nominal_bayar?: number | string; metode_pembayaran?: string } | null;
+};
+
+function formatActivityTime(value: string) {
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
 export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -47,9 +68,7 @@ export default function AdminDashboardPage() {
     alumniCount: 0,
   });
 
-  const [recentActivities, setRecentActivities] = useState<
-    { title: string; category: string; time: string }[]
-  >([]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
 
   const [kelasChartData, setKelasChartData] = useState<{ name: string; jumlah: number }[]>([]);
   const [keuanganPieData, setKeuanganPieData] = useState<{ name: string; value: number }[]>([]);
@@ -127,8 +146,38 @@ export default function AdminDashboardPage() {
         console.warn("Gagal memuat data keuangan untuk chart:", e);
       }
 
-      // Construct activity feed based on available DB records
-      const activities: { title: string; category: string; time: string }[] = [];
+      // Build the activity feed from durable finance audit records, then add
+      // the existing content/data summaries as supplementary activity.
+      const activities: RecentActivity[] = [];
+
+      const { data: financeAudit, error: financeAuditError } = await supabase
+        .from("audit_keuangan")
+        .select("terjadi_pada, aksi, nama_tabel, data_baru")
+        .in("nama_tabel", ["tagihan_siswa", "transaksi_pembayaran"])
+        .order("terjadi_pada", { ascending: false })
+        .limit(8);
+
+      if (financeAuditError) {
+        console.warn("Gagal memuat audit keuangan:", financeAuditError.message);
+      } else {
+        (financeAudit as FinanceAudit[] | null)?.forEach((audit) => {
+          const transaction = audit.data_baru;
+          const nominal = Number(transaction?.nominal_bayar || 0);
+          const isPayment = audit.nama_tabel === "transaksi_pembayaran";
+          const actionLabel = audit.aksi === "INSERT" ? "ditambahkan" : audit.aksi === "UPDATE" ? "diperbarui" : "dihapus";
+
+          activities.push({
+            title: isPayment
+              ? `Pembayaran ${actionLabel}${audit.aksi === "INSERT" ? `: Rp ${nominal.toLocaleString("id-ID")}` : ""}`
+              : `Tagihan siswa ${actionLabel}`,
+            category: isPayment
+              ? `Keuangan${transaction?.metode_pembayaran ? ` • ${transaction.metode_pembayaran}` : ""}`
+              : "Tagihan Siswa",
+            time: formatActivityTime(audit.terjadi_pada),
+            occurredAt: audit.terjadi_pada,
+          });
+        });
+      }
 
       if (beritaRes.data && beritaRes.data.length > 0) {
         const latestNews = beritaRes.data[0];
@@ -155,7 +204,11 @@ export default function AdminDashboardPage() {
         });
       }
 
-      setRecentActivities(activities);
+      setRecentActivities(
+        activities
+          .sort((a, b) => (b.occurredAt || "").localeCompare(a.occurredAt || ""))
+          .slice(0, 8)
+      );
     } catch (error) {
       console.error("Gagal memuat data dashboard:", error);
     } finally {
