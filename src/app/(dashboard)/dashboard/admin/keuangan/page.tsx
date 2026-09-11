@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Wallet, Users, ReceiptText, ArrowUpRight, ArrowDownRight, Loader2, Settings2, FileDown, CalendarDays, Search, WalletCards } from "lucide-react";
+import { Wallet, Users, ReceiptText, ArrowUpRight, ArrowDownRight, Loader2, Settings2, FileDown, FileText, CalendarDays, Search, WalletCards } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import { printSchoolReport } from "@/lib/report-print";
+import { siteConfig } from "@/constants/site";
 import {
   BarChart,
   Bar,
@@ -35,6 +37,7 @@ export default function KeuanganDashboardPage() {
   const [laporanLoading, setLaporanLoading] = useState(false);
   const [laporanTotal, setLaporanTotal] = useState(0);
   const [monthlyChartData, setMonthlyChartData] = useState<{ name: string; total: number }[]>([]);
+  const [schoolAddress, setSchoolAddress] = useState(siteConfig.contact.address);
 
   useEffect(() => {
     fetchStats();
@@ -43,6 +46,11 @@ export default function KeuanganDashboardPage() {
     const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
     setStartDate(oneMonthAgo.toISOString().split("T")[0]);
     setEndDate(now.toISOString().split("T")[0]);
+    const loadSchoolAddress = async () => {
+      const { data } = await supabase.from("pengaturan").select("alamat").eq("id", 1).maybeSingle();
+      if (data?.alamat?.trim()) setSchoolAddress(data.alamat.trim());
+    };
+    void loadSchoolAddress();
   }, []);
 
   const fetchStats = async () => {
@@ -241,6 +249,35 @@ export default function KeuanganDashboardPage() {
     toast.success(`File "${fileName}" berhasil diunduh!`);
   };
 
+  const printPaymentReport = () => {
+    if (laporanData.length === 0) {
+      toast.error("Tampilkan laporan terlebih dahulu sebelum mencetak.");
+      return;
+    }
+
+    const period = `${new Date(startDate).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })} s.d. ${new Date(endDate).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}`;
+    const printed = printSchoolReport({
+      title: "Laporan Pembayaran Siswa",
+      subtitle: "Rekap transaksi pembayaran tagihan siswa",
+      period: `Periode: ${period}`,
+      address: schoolAddress,
+      columns: [
+        { key: "no", label: "No.", align: "center" }, { key: "tanggal", label: "Tanggal" },
+        { key: "nama", label: "Nama Siswa" }, { key: "nis", label: "NIS" }, { key: "kelas", label: "Kelas" },
+        { key: "nominal", label: "Nominal", align: "right" }, { key: "metode", label: "Metode", align: "center" }, { key: "petugas", label: "Petugas" },
+      ],
+      rows: laporanData.map((item: any, index: number) => ({
+        no: index + 1,
+        tanggal: item.tanggal_bayar ? new Date(item.tanggal_bayar).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" }) : "-",
+        nama: item.siswa?.nama || "-", nis: item.siswa?.nis || "-", kelas: item.siswa?.kelas || "-",
+        nominal: `Rp ${Number(item.nominal_bayar).toLocaleString("id-ID")}`,
+        metode: item.metode_pembayaran || "-", petugas: item.petugas || "-",
+      })),
+      summary: [{ label: "Jumlah Transaksi", value: `${laporanData.length} transaksi` }, { label: "Total Pemasukan", value: `Rp ${laporanTotal.toLocaleString("id-ID")}` }],
+    });
+    if (!printed) toast.error("Popup diblokir browser. Izinkan popup untuk mencetak laporan.");
+  };
+
   const CHART_COLORS = ["#10b981", "#14b8a6", "#06b6d4", "#3b82f6", "#6366f1", "#8b5cf6"];
 
   return (
@@ -382,6 +419,15 @@ export default function KeuanganDashboardPage() {
             >
               <FileDown className="w-4 h-4 mr-2" />
               Export ke Excel
+            </Button>
+            <Button
+              variant="outline"
+              onClick={printPaymentReport}
+              disabled={laporanData.length === 0}
+              className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Cetak / PDF
             </Button>
           </div>
 

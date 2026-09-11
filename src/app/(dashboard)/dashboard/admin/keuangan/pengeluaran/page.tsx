@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowDownRight, ArrowUpRight, Loader2, Plus, RotateCcw, WalletCards } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, FileDown, FileText, Loader2, Plus, RotateCcw, WalletCards } from "lucide-react";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
+import { printSchoolReport } from "@/lib/report-print";
+import { siteConfig } from "@/constants/site";
 
 type Expense = {
   id: string;
@@ -32,6 +35,7 @@ export default function PengeluaranPage() {
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [schoolAddress, setSchoolAddress] = useState(siteConfig.contact.address);
   const [form, setForm] = useState({ kategori: "Operasional", deskripsi: "", nominal: "", metode_pembayaran: "CASH", tanggal: new Date().toISOString().slice(0, 10) });
 
   const loadLedger = useCallback(async () => {
@@ -56,6 +60,14 @@ export default function PengeluaranPage() {
     };
     void loadInitialLedger();
   }, [loadLedger]);
+
+  useEffect(() => {
+    const loadSchoolAddress = async () => {
+      const { data } = await supabase.from("pengaturan").select("alamat").eq("id", 1).maybeSingle();
+      if (data?.alamat?.trim()) setSchoolAddress(data.alamat.trim());
+    };
+    void loadSchoolAddress();
+  }, []);
 
   const totalPemasukan = incomes.reduce((total, item) => total + Number(item.nominal_bayar), 0);
   const totalPengeluaran = expenses.filter((item) => item.status === "active").reduce((total, item) => total + Number(item.nominal), 0);
@@ -103,6 +115,114 @@ export default function PengeluaranPage() {
     else { toast.success("Pengeluaran dibatalkan. Saldo telah dihitung ulang."); loadLedger(); }
   };
 
+  const exportLedger = () => {
+    if (ledger.length === 0) {
+      toast.error("Belum ada transaksi untuk diekspor.");
+      return;
+    }
+
+    let runningBalance = 0;
+    const exportRows: Record<string, string | number>[] = [...ledger]
+      .sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime())
+      .map((item, index) => {
+        const isVoided = item.status === "void";
+        const income = item.jenis === "Pemasukan" ? item.nominal : 0;
+        const expense = item.jenis === "Pengeluaran" && !isVoided ? item.nominal : 0;
+        runningBalance += income - expense;
+
+        return {
+          No: index + 1,
+          Tanggal: new Date(item.tanggal).toLocaleString("id-ID"),
+          Jenis: item.jenis,
+          Keterangan: item.keterangan,
+          Metode: item.metode,
+          Status: isVoided ? "DIBATALKAN" : "AKTIF",
+          "Pemasukan (Rp)": income,
+          "Pengeluaran (Rp)": expense,
+          "Saldo Berjalan (Rp)": runningBalance,
+        };
+      });
+
+    exportRows.push({
+      No: "",
+      Tanggal: "",
+      Jenis: "RINGKASAN",
+      Keterangan: "Total pemasukan",
+      Metode: "",
+      Status: "",
+      "Pemasukan (Rp)": totalPemasukan,
+      "Pengeluaran (Rp)": "",
+      "Saldo Berjalan (Rp)": "",
+    });
+    exportRows.push({
+      No: "",
+      Tanggal: "",
+      Jenis: "RINGKASAN",
+      Keterangan: "Total pengeluaran aktif",
+      Metode: "",
+      Status: "",
+      "Pemasukan (Rp)": "",
+      "Pengeluaran (Rp)": totalPengeluaran,
+      "Saldo Berjalan (Rp)": "",
+    });
+    exportRows.push({
+      No: "",
+      Tanggal: "",
+      Jenis: "RINGKASAN",
+      Keterangan: "Saldo kas tersisa",
+      Metode: "",
+      Status: "",
+      "Pemasukan (Rp)": "",
+      "Pengeluaran (Rp)": "",
+      "Saldo Berjalan (Rp)": saldo,
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(exportRows);
+    worksheet["!cols"] = [
+      { wch: 6 }, { wch: 22 }, { wch: 15 }, { wch: 42 }, { wch: 14 },
+      { wch: 16 }, { wch: 18 }, { wch: 20 }, { wch: 22 },
+    ];
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Buku Kas");
+    const today = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(workbook, `Laporan_Buku_Kas_${today}.xlsx`);
+    toast.success("Laporan buku kas berhasil diunduh.");
+  };
+
+  const printLedger = () => {
+    const rows = [...ledger]
+      .sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime())
+      .map((item, index) => ({
+        no: index + 1,
+        tanggal: new Date(item.tanggal).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" }),
+        uraian: item.keterangan,
+        jenis: item.jenis,
+        metode: item.metode,
+        pemasukan: item.jenis === "Pemasukan" ? formatRupiah(item.nominal) : "-",
+        pengeluaran: item.jenis === "Pengeluaran" && item.status !== "void" ? formatRupiah(item.nominal) : "-",
+        status: item.status === "void" ? "DIBATALKAN" : "AKTIF",
+      }));
+
+    if (!printSchoolReport({
+      title: "Laporan Buku Kas",
+      subtitle: "Rekapitulasi pemasukan dan pengeluaran sekolah",
+      period: "Seluruh periode transaksi",
+      address: schoolAddress,
+      columns: [
+        { key: "no", label: "No.", align: "center" }, { key: "tanggal", label: "Tanggal" },
+        { key: "uraian", label: "Uraian" }, { key: "jenis", label: "Jenis" }, { key: "metode", label: "Metode" },
+        { key: "pemasukan", label: "Pemasukan", align: "right" }, { key: "pengeluaran", label: "Pengeluaran", align: "right" },
+        { key: "status", label: "Status", align: "center" },
+      ],
+      rows,
+      summary: [
+        { label: "Total Pemasukan", value: formatRupiah(totalPemasukan) },
+        { label: "Total Pengeluaran Aktif", value: formatRupiah(totalPengeluaran) },
+        { label: "Saldo Kas Tersisa", value: formatRupiah(saldo) },
+      ],
+    })) toast.error("Popup diblokir browser. Izinkan popup untuk mencetak laporan.");
+  };
+
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div>
@@ -132,7 +252,7 @@ export default function PengeluaranPage() {
         </Card>
 
         <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between"><div><CardTitle>Laporan Buku Kas</CardTitle><CardDescription>Riwayat pemasukan dan pengeluaran terbaru.</CardDescription></div><Button variant="outline" size="sm" onClick={loadLedger} disabled={isLoading}><RotateCcw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />Refresh</Button></CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between"><div><CardTitle>Laporan Buku Kas</CardTitle><CardDescription>Riwayat pemasukan dan pengeluaran terbaru.</CardDescription></div><div className="flex gap-2"><Button variant="outline" size="sm" onClick={printLedger} disabled={isLoading}><FileText className="mr-2 h-4 w-4" />Cetak / PDF</Button><Button variant="outline" size="sm" onClick={exportLedger} disabled={isLoading || ledger.length === 0}><FileDown className="mr-2 h-4 w-4" />Unduh Excel</Button><Button variant="outline" size="sm" onClick={loadLedger} disabled={isLoading}><RotateCcw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />Refresh</Button></div></CardHeader>
           <CardContent>
             {isLoading ? <div className="flex justify-center py-16"><Loader2 className="h-7 w-7 animate-spin text-emerald-600" /></div> : <div className="max-h-[560px] overflow-auto rounded-lg border"><table className="w-full text-sm"><thead className="sticky top-0 bg-muted"><tr><th className="p-3 text-left">Tanggal</th><th className="p-3 text-left">Keterangan</th><th className="p-3 text-left">Jenis</th><th className="p-3 text-right">Nominal</th><th className="p-3 text-right">Aksi</th></tr></thead><tbody>{ledger.map((item) => <tr key={item.id} className="border-t"><td className="p-3 text-xs whitespace-nowrap">{new Date(item.tanggal).toLocaleDateString("id-ID")}</td><td className="p-3"><p className="font-medium">{item.keterangan}</p><p className="text-xs text-muted-foreground">{item.metode}{item.status === "void" ? " • Dibatalkan" : ""}</p></td><td className={`p-3 font-medium ${item.jenis === "Pemasukan" ? "text-emerald-700" : "text-rose-700"}`}>{item.jenis}</td><td className={`p-3 text-right font-mono font-semibold ${item.status === "void" ? "line-through text-muted-foreground" : item.jenis === "Pemasukan" ? "text-emerald-700" : "text-rose-700"}`}>{item.jenis === "Pemasukan" ? "+" : "-"}{formatRupiah(item.nominal)}</td><td className="p-3 text-right">{item.jenis === "Pengeluaran" && item.status === "active" ? <Button variant="ghost" size="sm" className="text-rose-600" onClick={() => voidExpense(expenses.find((expense) => `out-${expense.id}` === item.id)!)}>Batalkan</Button> : "-"}</td></tr>)}</tbody></table></div>}
           </CardContent>
