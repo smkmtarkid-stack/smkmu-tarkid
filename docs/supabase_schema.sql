@@ -203,7 +203,13 @@ CREATE TABLE IF NOT EXISTS public.walisiswa (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Row Level Security (RLS) Configuration (Akses Publik Read-Only)
+/*
+DEPRECATED SECURITY POLICIES — DO NOT EXECUTE.
+The application used to create the permissive policies below. They are kept as
+historical reference only. After creating the schema, run
+security-hardening.sql to apply the active role-based RLS configuration.
+
+Row Level Security (RLS) Configuration (legacy)
 ALTER TABLE public.profil ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.guru ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.jurusan ENABLE ROW LEVEL SECURITY;
@@ -284,4 +290,4 @@ CREATE TABLE public.pengaturan (
 ALTER TABLE public.pengaturan ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public Read Pengaturan" ON public.pengaturan FOR SELECT USING (true);
 CREATE POLICY "Anon Write Pengaturan" ON public.pengaturan FOR ALL USING (true);
-
+*/

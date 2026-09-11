@@ -39,10 +39,8 @@ ALTER TABLE public.kategori_tagihan ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tagihan_siswa ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transaksi_pembayaran ENABLE ROW LEVEL SECURITY;
 
--- Policy dasar: Admin bisa akses semua (Diubah menjadi public untuk testing lokal)
-CREATE POLICY "Enable read/write for public" ON public.kategori_tagihan FOR ALL TO public USING (true);
-CREATE POLICY "Enable read/write for public" ON public.tagihan_siswa FOR ALL TO public USING (true);
-CREATE POLICY "Enable read/write for public" ON public.transaksi_pembayaran FOR ALL TO public USING (true);
+-- SECURITY: Do not add public policies here. Run docs/security-hardening.sql
+-- after this migration to grant access only to active admin/superadmin roles.
 
 -- ==========================================
 -- MIGRASI: Tambah kolom tahun_ajaran & kelas_saat_tagihan
@@ -79,7 +77,7 @@ CREATE TABLE public.master_tahun_ajaran (
 
 -- Setup RLS untuk master_tahun_ajaran
 ALTER TABLE public.master_tahun_ajaran ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Enable read/write for public" ON public.master_tahun_ajaran FOR ALL TO public USING (true);
+-- RLS policies are intentionally defined in docs/security-hardening.sql.
 
 -- Insert data awal (2026/2027 aktif sebagai default)
 INSERT INTO public.master_tahun_ajaran (nama_tahun, is_active)

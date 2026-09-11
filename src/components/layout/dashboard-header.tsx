@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Menu, User, Bell, ChevronDown, Settings, LogOut, ShieldCheck, UserCheck } from "lucide-react";
+import { Menu, Bell, ChevronDown, Settings, ShieldCheck, UserCheck } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { DashboardSidebar } from "./dashboard-sidebar";
+import { LogoutButton } from "@/components/auth/logout-button";
 
 export function DashboardHeader() {
   const [open, setOpen] = useState(false);
@@ -276,14 +277,7 @@ export function DashboardHeader() {
 
               {/* Footer / Logout */}
               <div className="p-1.5 border-t border-border/50 mt-1">
-                <Link
-                  href="/login"
-                  onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Keluar Akun
-                </Link>
+                <LogoutButton compact onComplete={() => setDropdownOpen(false)} />
               </div>
             </div>
           )}

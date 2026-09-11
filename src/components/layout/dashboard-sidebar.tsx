@@ -3,13 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, GraduationCap, ChevronDown, ChevronRight } from "lucide-react";
+import { GraduationCap, ChevronDown, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { adminNav, siswaNav, alumniNav } from "@/constants/navigation";
 import * as Icons from "lucide-react";
+import { LogoutButton } from "@/components/auth/logout-button";
 
 interface DashboardSidebarProps {
   className?: string;
@@ -136,12 +135,7 @@ export function DashboardSidebar({ className, onClose }: DashboardSidebarProps) 
       </div>
 
       <div className="p-4 border-t border-border/60 bg-muted/20">
-        <Link href="/login" className="w-full">
-          <Button variant="ghost" className="w-full justify-start text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors font-medium">
-            <LogOut className="mr-2.5 h-4 w-4" />
-            Keluar Portal
-          </Button>
-        </Link>
+        <LogoutButton onComplete={onClose} />
       </div>
     </div>
   );
