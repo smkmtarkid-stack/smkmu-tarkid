@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS public.profil (
 -- 2. Tabel Guru & Staf
 CREATE TABLE IF NOT EXISTS public.guru (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    urutan BIGSERIAL UNIQUE,
     nama VARCHAR(255) NOT NULL,
     nip_nuptk VARCHAR(100),
     tempat_lahir VARCHAR(255),

@@ -20,6 +20,8 @@ export interface Profile {
 /** Sheet: Guru */
 export interface Teacher {
   id: string;
+  /** Posisi tetap berdasarkan baris saat diimpor. */
+  urutan?: number;
   nama: string;
   /** NIP atau NUPTK; dapat kosong bila belum dimiliki. */
   nip_nuptk?: string;

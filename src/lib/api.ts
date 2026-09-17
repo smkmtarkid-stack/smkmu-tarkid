@@ -21,13 +21,23 @@ function getTableName(sheetName: string): string {
 export async function fetchSheet(tableName: string): Promise<ApiResponse> {
   try {
     const table = getTableName(tableName);
-    // PostgreSQL tidak menjamin urutan hasil tanpa ORDER BY. Menggunakan waktu
-    // pembuatan lalu id menjaga posisi baris tetap sama saat suatu data diedit.
-    const { data, error } = await supabase
+    // Guru memakai nomor urut khusus agar urutan baris impor tidak berubah
+    // saat data diperbarui. Tabel lain tetap memakai waktu pembuatan.
+    const orderColumn = table === "guru" ? "urutan" : "created_at";
+    let { data, error } = await supabase
       .from(table)
       .select("*")
-      .order("created_at", { ascending: true })
+      .order(orderColumn, { ascending: true })
       .order("id", { ascending: true });
+
+    // Kompatibilitas sementara bila migrasi urutan guru belum dijalankan.
+    if (error && table === "guru" && error.message.includes("urutan")) {
+      ({ data, error } = await supabase
+        .from(table)
+        .select("*")
+        .order("created_at", { ascending: true })
+        .order("id", { ascending: true }));
+    }
 
     if (error) throw error;
     return { status: "success", data: (data || []) as unknown as Record<string, string>[] };
