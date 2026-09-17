@@ -116,6 +116,7 @@ export interface Student {
   id: string;
   nis: string;
   nama: string;
+  tahun_ajaran?: string;
   kelas: string;
   jurusan: string;
   email: string;

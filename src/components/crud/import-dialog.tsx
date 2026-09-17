@@ -8,6 +8,25 @@ import { FieldDef } from "./form-dialog";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 
+function normalizeHeader(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function formatImportedValue(value: unknown, type?: FieldDef["type"]) {
+  if (type === "date" && typeof value === "number") {
+    const date = XLSX.SSF.parse_date_code(value);
+    if (date) {
+      return `${date.y}-${String(date.m).padStart(2, "0")}-${String(date.d).padStart(2, "0")}`;
+    }
+  }
+
+  return String(value).trim();
+}
+
 interface ImportDialogProps {
   open: boolean;
   onClose: () => void;
@@ -26,6 +45,7 @@ export function ImportDialog({
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewData, setPreviewData] = useState<Record<string, any>[]>([]);
+  const [mappingError, setMappingError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Filter fields to only get data entry fields (exclude file fields for now as they can't be imported easily)
@@ -34,6 +54,7 @@ export function ImportDialog({
   const resetState = () => {
     setFile(null);
     setPreviewData([]);
+    setMappingError("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -56,30 +77,55 @@ export function ImportDialog({
       const firstSheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[firstSheetName];
       
-      // Convert to JSON, treat first row as header
-      const json = XLSX.utils.sheet_to_json<Record<string, any>>(worksheet);
-      
-      if (json.length === 0) {
-        toast.error("File Excel/CSV kosong atau format tidak sesuai.");
-        setFile(null);
-        setIsProcessing(false);
+      // Some school templates put a title above the table. Find the first row
+      // that contains a known field name, then use that row as the Excel header.
+      const acceptedHeaders = dataFields.flatMap((field) =>
+        [field.key, field.label, ...(field.importAliases || [])].map(normalizeHeader)
+      );
+      const sheetRows = XLSX.utils.sheet_to_json<unknown[]>(worksheet, {
+        header: 1,
+        defval: "",
+      });
+      const headerRowIndex = sheetRows.findIndex((row) =>
+        row.some((cell) => acceptedHeaders.includes(normalizeHeader(String(cell))))
+      );
+
+      if (headerRowIndex === -1) {
+        const message = "Kolom file tidak dikenali. Gunakan header yang ditampilkan atau variasi seperti Nama Guru, NIP, NUPTK, dan Jabatan.";
+        setMappingError(message);
+        toast.error(message);
         return;
       }
 
-      // Try to map or normalize keys
+      const json = XLSX.utils.sheet_to_json<Record<string, any>>(worksheet, {
+        range: headerRowIndex,
+        defval: "",
+      });
+      if (json.length === 0) {
+        toast.error("File Excel/CSV kosong atau format tidak sesuai.");
+        setFile(null);
+        return;
+      }
+
+      const headers = Object.keys(json[0]);
+      const matchedHeaders = new Map(
+        dataFields.map((field) => {
+          const fieldHeaders = [field.key, field.label, ...(field.importAliases || [])]
+            .map(normalizeHeader);
+          const header = headers.find((headerName) => fieldHeaders.includes(normalizeHeader(headerName)));
+          return [field.key, header] as const;
+        })
+      );
+
+      // Map headers after removing differences in capitalization, spaces, underscores, and punctuation.
       const normalizedData = json.map(row => {
         const newRow: Record<string, any> = {};
-        
-        // Loop through required fields and try to find a matching column in Excel
+
         dataFields.forEach(field => {
-          // Look for exact key or label match (case insensitive)
-          const matchedKey = Object.keys(row).find(
-            k => k.toLowerCase() === field.key.toLowerCase() || 
-                 k.toLowerCase() === field.label.toLowerCase()
-          );
-          
-          if (matchedKey && row[matchedKey] !== undefined) {
-            newRow[field.key] = String(row[matchedKey]).trim();
+          const matchedKey = matchedHeaders.get(field.key);
+
+          if (matchedKey && row[matchedKey] !== undefined && row[matchedKey] !== "") {
+            newRow[field.key] = formatImportedValue(row[matchedKey], field.type);
           }
         });
         
@@ -88,7 +134,14 @@ export function ImportDialog({
 
       // Filter out completely empty rows
       const validData = normalizedData.filter(row => Object.keys(row).length > 0);
-      
+      if (validData.length === 0) {
+        const message = "Tidak ada nilai data yang dapat diimpor dari file ini.";
+        setMappingError(message);
+        toast.error(message);
+        return;
+      }
+
+      setMappingError("");
       setPreviewData(validData);
     } catch (error) {
       console.error(error);
@@ -164,6 +217,12 @@ export function ImportDialog({
                   <XCircle className="h-4 w-4 text-slate-400 hover:text-rose-500" />
                 </Button>
               </div>
+
+              {mappingError && (
+                <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+                  {mappingError}
+                </p>
+              )}
 
               {previewData.length > 0 && (
                 <div className="border rounded-md overflow-hidden">

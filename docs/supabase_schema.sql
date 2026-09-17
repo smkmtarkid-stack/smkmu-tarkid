@@ -134,6 +134,7 @@ CREATE TABLE IF NOT EXISTS public.siswa (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nis VARCHAR(50) UNIQUE NOT NULL,
     nama VARCHAR(255) NOT NULL,
+    tahun_ajaran VARCHAR(20),
     kelas VARCHAR(50),
     jurusan VARCHAR(100),
     email VARCHAR(255),

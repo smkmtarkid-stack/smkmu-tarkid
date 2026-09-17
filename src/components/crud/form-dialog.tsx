@@ -21,6 +21,8 @@ export interface FieldDef {
   label: string;
   type?: "text" | "textarea" | "url" | "email" | "number" | "date" | "file" | "select";
   options?: { label: string; value: string }[];
+  /** Variasi nama kolom yang diterima saat impor Excel/CSV. */
+  importAliases?: string[];
   placeholder?: string;
   required?: boolean;
 }

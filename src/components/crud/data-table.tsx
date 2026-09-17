@@ -19,12 +19,18 @@ export interface ColumnDef {
   render?: (value: string, row: Record<string, string>) => React.ReactNode;
 }
 
+export interface FilterDef {
+  key: string;
+  label: string;
+}
+
 interface DataTableProps {
   columns: ColumnDef[];
   data: Record<string, string>[];
   onEdit?: (row: Record<string, string>) => void;
   onDelete?: (row: Record<string, string>) => void;
   searchableKey?: string;
+  filters?: FilterDef[];
   pageSize?: number;
 }
 
@@ -34,27 +40,42 @@ export function DataTable({
   onEdit,
   onDelete,
   searchableKey,
+  filters = [],
   pageSize = 10,
 }: DataTableProps) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [filterValues, setFilterValues] = useState<Record<string, string>>({});
+
+  const filterOptions = useMemo(() => Object.fromEntries(
+    filters.map((filter) => [
+      filter.key,
+      [...new Set(data.map((row) => String(row[filter.key] || "").trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, "id")),
+    ])
+  ) as Record<string, string[]>, [data, filters]);
 
   const filtered = useMemo(() => {
-    if (!search || !searchableKey) return data;
-    return data.filter((row) =>
-      String(row[searchableKey] || "")
+    return data.filter((row) => {
+      const matchesSearch = !search || !searchableKey || String(row[searchableKey] || "")
         .toLowerCase()
-        .includes(search.toLowerCase())
-    );
-  }, [data, search, searchableKey]);
+        .includes(search.toLowerCase());
+      const matchesFilters = filters.every((filter) =>
+        !filterValues[filter.key] || String(row[filter.key] || "") === filterValues[filter.key]
+      );
+      return matchesSearch && matchesFilters;
+    });
+  }, [data, search, searchableKey, filters, filterValues]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div className="space-y-4">
-      {searchableKey && (
-        <div className="flex items-center justify-between gap-4">
+      {(searchableKey || filters.length > 0) && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-1 flex-wrap items-center gap-2 min-w-0">
+          {searchableKey && (
           <div className="relative max-w-sm flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -66,6 +87,25 @@ export function DataTable({
               }}
               className="pl-10 h-10 rounded-xl bg-card border-border/60 shadow-sm focus-visible:ring-emerald-500"
             />
+          </div>
+          )}
+          {filters.map((filter) => (
+            <select
+              key={filter.key}
+              aria-label={`Filter ${filter.label}`}
+              value={filterValues[filter.key] || ""}
+              onChange={(event) => {
+                setFilterValues((current) => ({ ...current, [filter.key]: event.target.value }));
+                setPage(1);
+              }}
+              className="h-10 min-w-40 rounded-xl border border-border/60 bg-card px-3 text-sm shadow-sm outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <option value="">Semua {filter.label}</option>
+              {(filterOptions[filter.key] || []).map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          ))}
           </div>
           {filtered.length > 0 && (
             <div className="text-xs font-medium text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-lg border border-border/40 hidden sm:block">

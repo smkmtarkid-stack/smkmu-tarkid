@@ -5,7 +5,7 @@ import { Plus, RefreshCw, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { DataTable, ColumnDef } from "@/components/crud/data-table";
+import { DataTable, ColumnDef, FilterDef } from "@/components/crud/data-table";
 import { FormDialog, FieldDef } from "@/components/crud/form-dialog";
 import { DeleteDialog } from "@/components/crud/delete-dialog";
 import { ImportDialog } from "@/components/crud/import-dialog";
@@ -19,6 +19,7 @@ interface CrudPageProps {
   columns: ColumnDef[];
   formFields: FieldDef[];
   searchableKey?: string;
+  filters?: FilterDef[];
   deleteNameKey?: string; // which field to show as the item name in the delete dialog
   enableImport?: boolean; // toggle import feature
 }
@@ -30,6 +31,7 @@ export function CrudPage({
   columns,
   formFields,
   searchableKey,
+  filters,
   deleteNameKey,
   enableImport = true,
 }: CrudPageProps) {
@@ -155,6 +157,7 @@ export function CrudPage({
           columns={columns}
           data={data}
           searchableKey={searchableKey}
+          filters={filters}
           onEdit={(row) => {
             setEditingRow(row);
             setFormOpen(true);

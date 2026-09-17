@@ -18,6 +18,7 @@ const columns: ColumnDef[] = [
 export default function SiswaAdminPage() {
   const [kelasOptions, setKelasOptions] = useState<{ label: string; value: string }[]>([]);
   const [jurusanOptions, setJurusanOptions] = useState<{ label: string; value: string }[]>([]);
+  const [tahunAjaranOptions, setTahunAjaranOptions] = useState<{ label: string; value: string }[]>([]);
 
   useEffect(() => {
     async function loadData() {
@@ -48,6 +49,15 @@ export default function SiswaAdminPage() {
           });
           setJurusanOptions(jOpt);
         }
+
+        const tahunAjaranRes = await fetchSheet("master_tahun_ajaran");
+        if (tahunAjaranRes.status === "success" && tahunAjaranRes.data) {
+          setTahunAjaranOptions(tahunAjaranRes.data
+            .map((tahun) => tahun.nama_tahun)
+            .filter(Boolean)
+            .sort((a, b) => b.localeCompare(a, "id"))
+            .map((tahun) => ({ label: tahun, value: tahun })));
+        }
       } catch (err) {
         console.error("Gagal memuat data kelas/jurusan:", err);
       }
@@ -58,6 +68,15 @@ export default function SiswaAdminPage() {
   const formFields: FieldDef[] = [
     { key: "nis", label: "NIS / NISN", required: true },
     { key: "nama", label: "Nama Lengkap Siswa", required: true },
+    {
+      key: "tahun_ajaran",
+      label: "Tahun Ajaran",
+      type: "select",
+      required: true,
+      options: tahunAjaranOptions.length > 0
+        ? tahunAjaranOptions
+        : [{ label: "Memuat tahun ajaran dari database...", value: "" }],
+    },
     {
       key: "kelas",
       label: "Kelas (Pilih Kelas Terdaftar di Database)",
@@ -89,6 +108,10 @@ export default function SiswaAdminPage() {
       columns={columns}
       formFields={formFields}
       searchableKey="nama"
+      filters={[
+        { key: "tahun_ajaran", label: "Tahun Ajaran" },
+        { key: "kelas", label: "Kelas" },
+      ]}
       deleteNameKey="nama"
     />
   );
