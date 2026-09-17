@@ -21,9 +21,15 @@ export interface Profile {
 export interface Teacher {
   id: string;
   nama: string;
-  mapel: string;
-  jabatan: string;
-  foto: string;
+  /** NIP atau NUPTK; dapat kosong bila belum dimiliki. */
+  nip_nuptk?: string;
+  tempat_lahir?: string;
+  tanggal_lahir?: string;
+  pendidikan_terakhir?: string;
+  /** Dipertahankan untuk data lama yang sudah memiliki mata pelajaran. */
+  mapel?: string;
+  jabatan?: string;
+  foto?: string;
 }
 
 /** Sheet: Jurusan */

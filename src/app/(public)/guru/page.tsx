@@ -43,7 +43,9 @@ export default async function GuruPage() {
                 </div>
                 <h3 className="font-bold text-sm line-clamp-2 group-hover:text-brand-primary transition-colors">{guru.nama}</h3>
                 <p className="text-xs text-muted-foreground mt-1">{guru.jabatan || "Guru"}</p>
-                <p className="text-xs text-brand-secondary font-medium mt-0.5">{guru.mapel}</p>
+                {guru.mapel && (
+                  <p className="text-xs text-brand-secondary font-medium mt-0.5">{guru.mapel}</p>
+                )}
               </div>
             ))
           ) : (

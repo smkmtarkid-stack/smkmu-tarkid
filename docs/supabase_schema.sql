@@ -21,6 +21,10 @@ CREATE TABLE IF NOT EXISTS public.profil (
 CREATE TABLE IF NOT EXISTS public.guru (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nama VARCHAR(255) NOT NULL,
+    nip_nuptk VARCHAR(100),
+    tempat_lahir VARCHAR(255),
+    tanggal_lahir DATE,
+    pendidikan_terakhir VARCHAR(255),
     mapel VARCHAR(255),
     jabatan VARCHAR(255),
     foto TEXT,
