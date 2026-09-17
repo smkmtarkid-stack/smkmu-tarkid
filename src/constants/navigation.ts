@@ -44,7 +44,7 @@ export const mainNavigation: NavItem[] = [
     icon: BookOpen,
   },
   {
-    label: "Guru",
+    label: "Pendidik dan Tenaga Kependidikan",
     href: "/guru",
     icon: Users,
   },
@@ -90,7 +90,7 @@ export const footerNavigation = {
   ],
   akademik: [
     { label: "Jurusan", href: "/jurusan" },
-    { label: "Guru & Staff", href: "/guru" },
+    { label: "Pendidik dan Tenaga Kependidikan", href: "/guru" },
     { label: "Prestasi", href: "/prestasi" },
     { label: "PPDB", href: "/ppdb" },
   ],
@@ -112,8 +112,7 @@ export const adminNav = [
     children: [
       { label: "Jurusan", href: "/dashboard/admin/jurusan", icon: "BookOpen" },
       { label: "Kelas & Rombel", href: "/dashboard/admin/kelas", icon: "School" },
-      { label: "Guru", href: "/dashboard/admin/guru", icon: "Users" },
-      { label: "Tata Usaha & Staf", href: "/dashboard/admin/staff", icon: "UserCheck" },
+      { label: "Pendidik dan Tenaga Kependidikan", href: "/dashboard/admin/guru", icon: "Users" },
       { label: "Data Siswa", href: "/dashboard/admin/siswa", icon: "Users" },
       { label: "Wali Siswa", href: "/dashboard/admin/wali-siswa", icon: "Users" },
       { label: "Data Alumni", href: "/dashboard/admin/alumni", icon: "GraduationCap" },

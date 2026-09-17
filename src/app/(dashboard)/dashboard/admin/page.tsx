@@ -60,7 +60,6 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
     siswaCount: 0,
     guruCount: 0,
-    staffCount: 0,
     waliCount: 0,
     ppdbCount: 0,
     beritaCount: 0,
@@ -77,10 +76,9 @@ export default function AdminDashboardPage() {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      const [siswaRes, guruRes, staffRes, waliRes, ppdbRes, beritaRes, jurusanRes, alumniRes] = await Promise.all([
+      const [siswaRes, guruRes, waliRes, ppdbRes, beritaRes, jurusanRes, alumniRes] = await Promise.all([
         fetchSheet("siswa"),
         fetchSheet("guru"),
-        fetchSheet("staff"),
         fetchSheet("walisiswa"),
         fetchSheet("ppdb"),
         fetchSheet("berita"),
@@ -90,7 +88,6 @@ export default function AdminDashboardPage() {
 
       const siswaCount = siswaRes.status === "success" && siswaRes.data ? siswaRes.data.length : 0;
       const guruCount = guruRes.status === "success" && guruRes.data ? guruRes.data.length : 0;
-      const staffCount = staffRes.status === "success" && staffRes.data ? staffRes.data.length : 0;
       const waliCount = waliRes.status === "success" && waliRes.data ? waliRes.data.length : 0;
       const ppdbCount = ppdbRes.status === "success" && ppdbRes.data ? ppdbRes.data.length : 0;
       const beritaCount = beritaRes.status === "success" && beritaRes.data ? beritaRes.data.length : 0;
@@ -100,7 +97,6 @@ export default function AdminDashboardPage() {
       setStats({
         siswaCount,
         guruCount,
-        staffCount,
         waliCount,
         ppdbCount,
         beritaCount,
@@ -296,7 +292,7 @@ export default function AdminDashboardPage() {
         
         <Card className="rounded-2xl border-border/60 shadow-xs hover:shadow-md transition-all duration-300 group">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Guru & Pengajar</CardTitle>
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Pendidik dan Tenaga Kependidikan</CardTitle>
             <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 group-hover:scale-110 transition-transform">
               <BookOpen className="h-5 w-5" />
             </div>
@@ -307,24 +303,7 @@ export default function AdminDashboardPage() {
             ) : (
               <div className="text-3xl font-extrabold tracking-tight">{stats.guruCount}</div>
             )}
-            <p className="text-xs text-muted-foreground mt-2 font-medium">Pengajar Aktif di Database</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl border-border/60 shadow-xs hover:shadow-md transition-all duration-300 group">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">TU & Staf Sekolah</CardTitle>
-            <div className="p-2.5 rounded-xl bg-teal-50 text-teal-600 dark:bg-teal-950/50 dark:text-teal-400 group-hover:scale-110 transition-transform">
-              <Users className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Loader2 className="h-6 w-6 animate-spin text-teal-600 my-1" />
-            ) : (
-              <div className="text-3xl font-extrabold tracking-tight">{stats.staffCount}</div>
-            )}
-            <p className="text-xs text-teal-600 mt-2 font-medium">Tata Usaha, Satpam & Kebersihan</p>
+            <p className="text-xs text-muted-foreground mt-2 font-medium">Data aktif di database</p>
           </CardContent>
         </Card>
 

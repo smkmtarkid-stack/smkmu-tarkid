@@ -37,8 +37,8 @@ const formFields: FieldDef[] = [
 export default function GuruAdminPage() {
   return (
     <CrudPage
-      title="Guru"
-      description="Kelola data guru dan tenaga kependidikan."
+      title="Pendidik dan Tenaga Kependidikan"
+      description="Kelola data pendidik dan tenaga kependidikan."
       sheetName="Guru"
       columns={columns}
       formFields={formFields}

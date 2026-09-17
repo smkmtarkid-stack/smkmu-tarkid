@@ -5,7 +5,7 @@ import { getDirectImageUrl } from "@/lib/utils";
 import { User } from "lucide-react";
 
 export const metadata = {
-  title: "Guru & Staff | SMK Muhammadiyah Tarogong Kidul",
+  title: "Pendidik dan Tenaga Kependidikan | SMK Muhammadiyah Tarogong Kidul",
   description: "Daftar tenaga pendidik dan kependidikan SMK Muhammadiyah Tarogong Kidul",
 };
 
@@ -17,7 +17,7 @@ export default async function GuruPage() {
     <div className="pt-24 pb-16 min-h-screen bg-background">
       <div className="container-custom">
         <SectionTitle 
-          title="Guru & Tenaga Kependidikan" 
+          title="Pendidik dan Tenaga Kependidikan"
           subtitle="Para pendidik profesional yang berdedikasi tinggi dalam membentuk generasi unggul."
           className="mb-12"
         />
@@ -50,7 +50,7 @@ export default async function GuruPage() {
             ))
           ) : (
             <div className="col-span-full text-center text-muted-foreground py-20 bg-muted/30 rounded-2xl border">
-              Data guru belum tersedia.
+              Data pendidik dan tenaga kependidikan belum tersedia.
             </div>
           )}
         </div>
