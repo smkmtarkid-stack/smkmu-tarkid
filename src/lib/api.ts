@@ -21,7 +21,13 @@ function getTableName(sheetName: string): string {
 export async function fetchSheet(tableName: string): Promise<ApiResponse> {
   try {
     const table = getTableName(tableName);
-    const { data, error } = await supabase.from(table).select("*");
+    // PostgreSQL tidak menjamin urutan hasil tanpa ORDER BY. Menggunakan waktu
+    // pembuatan lalu id menjaga posisi baris tetap sama saat suatu data diedit.
+    const { data, error } = await supabase
+      .from(table)
+      .select("*")
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
 
     if (error) throw error;
     return { status: "success", data: (data || []) as unknown as Record<string, string>[] };

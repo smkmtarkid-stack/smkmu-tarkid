@@ -4,6 +4,10 @@ import Image from "next/image";
 import { getDirectImageUrl } from "@/lib/utils";
 import { User } from "lucide-react";
 
+// Data pendidik dikelola dari dashboard, sehingga halaman publik harus
+// mengambil data terbaru pada setiap kunjungan, bukan hasil prerender build.
+export const revalidate = 0;
+
 export const metadata = {
   title: "Pendidik dan Tenaga Kependidikan | SMK Muhammadiyah Tarogong Kidul",
   description: "Daftar tenaga pendidik dan kependidikan SMK Muhammadiyah Tarogong Kidul",
