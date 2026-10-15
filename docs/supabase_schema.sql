@@ -99,10 +99,23 @@ CREATE TABLE IF NOT EXISTS public.galeri (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 9. Tabel PPDB
+-- 9. Tabel PPDB (Penerimaan Peserta Didik Baru Online)
 CREATE TABLE IF NOT EXISTS public.ppdb (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    judul VARCHAR(255) NOT NULL,
+    no_pendaftaran VARCHAR(50) UNIQUE,
+    nama_lengkap VARCHAR(255) NOT NULL,
+    nisn VARCHAR(50),
+    tempat_lahir VARCHAR(100),
+    tanggal_lahir DATE,
+    jenis_kelamin VARCHAR(20),
+    asal_sekolah VARCHAR(255),
+    jurusan VARCHAR(100),
+    nama_ortu VARCHAR(255),
+    no_hp VARCHAR(50),
+    alamat TEXT,
+    status VARCHAR(50) DEFAULT 'Menunggu',
+    catatan TEXT,
+    judul VARCHAR(255),
     isi TEXT,
     link TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -155,6 +168,8 @@ CREATE TABLE IF NOT EXISTS public.alumni (
     kampus VARCHAR(255),
     email VARCHAR(255),
     foto TEXT,
+    status VARCHAR(50),
+    testimoni TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -209,76 +224,8 @@ CREATE TABLE IF NOT EXISTS public.walisiswa (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-/*
-DEPRECATED SECURITY POLICIES — DO NOT EXECUTE.
-The application used to create the permissive policies below. They are kept as
-historical reference only. After creating the schema, run
-security-hardening.sql to apply the active role-based RLS configuration.
-
-Row Level Security (RLS) Configuration (legacy)
-ALTER TABLE public.profil ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.guru ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.jurusan ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.berita ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.prestasi ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.pengumuman ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.agenda ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.galeri ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ppdb ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.download ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.slider ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.siswa ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.alumni ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.kelas ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.staff ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.walisiswa ENABLE ROW LEVEL SECURITY;
-
--- Policy untuk read public
-CREATE POLICY "Public Read Profil" ON public.profil FOR SELECT USING (true);
-CREATE POLICY "Public Read Guru" ON public.guru FOR SELECT USING (true);
-CREATE POLICY "Public Read Jurusan" ON public.jurusan FOR SELECT USING (true);
-CREATE POLICY "Public Read Berita" ON public.berita FOR SELECT USING (true);
-CREATE POLICY "Public Read Prestasi" ON public.prestasi FOR SELECT USING (true);
-CREATE POLICY "Public Read Pengumuman" ON public.pengumuman FOR SELECT USING (true);
-CREATE POLICY "Public Read Agenda" ON public.agenda FOR SELECT USING (true);
-CREATE POLICY "Public Read Galeri" ON public.galeri FOR SELECT USING (true);
-CREATE POLICY "Public Read PPDB" ON public.ppdb FOR SELECT USING (true);
-CREATE POLICY "Public Read Download" ON public.download FOR SELECT USING (true);
-CREATE POLICY "Public Read Slider" ON public.slider FOR SELECT USING (true);
-CREATE POLICY "Public Read Siswa" ON public.siswa FOR SELECT USING (true);
-CREATE POLICY "Public Read Alumni" ON public.alumni FOR SELECT USING (true);
-CREATE POLICY "Public Read Kelas" ON public.kelas FOR SELECT USING (true);
-CREATE POLICY "Public Read Staff" ON public.staff FOR SELECT USING (true);
-CREATE POLICY "Public Read WaliSiswa" ON public.walisiswa FOR SELECT USING (true);
-
--- Policy untuk Full Access (Insert/Update/Delete) via Anon/Auth
-CREATE POLICY "Anon Write Profil" ON public.profil FOR ALL USING (true);
-CREATE POLICY "Anon Write Guru" ON public.guru FOR ALL USING (true);
-CREATE POLICY "Anon Write Jurusan" ON public.jurusan FOR ALL USING (true);
-CREATE POLICY "Anon Write Berita" ON public.berita FOR ALL USING (true);
-CREATE POLICY "Anon Write Prestasi" ON public.prestasi FOR ALL USING (true);
-CREATE POLICY "Anon Write Pengumuman" ON public.pengumuman FOR ALL USING (true);
-CREATE POLICY "Anon Write Agenda" ON public.agenda FOR ALL USING (true);
-CREATE POLICY "Anon Write Galeri" ON public.galeri FOR ALL USING (true);
-CREATE POLICY "Anon Write PPDB" ON public.ppdb FOR ALL USING (true);
-CREATE POLICY "Anon Write Download" ON public.download FOR ALL USING (true);
-CREATE POLICY "Anon Write Slider" ON public.slider FOR ALL USING (true);
-CREATE POLICY "Anon Write Siswa" ON public.siswa FOR ALL USING (true);
-CREATE POLICY "Anon Write Alumni" ON public.alumni FOR ALL USING (true);
-CREATE POLICY "Anon Write Users" ON public.users FOR ALL USING (true);
-CREATE POLICY "Anon Write Kelas" ON public.kelas FOR ALL USING (true);
-CREATE POLICY "Anon Write Staff" ON public.staff FOR ALL USING (true);
-CREATE POLICY "Anon Write WaliSiswa" ON public.walisiswa FOR ALL USING (true);
-
--- STORAGE BUCKETS INSTRUCTIONS:
--- Buat Bucket bernama "uploads" di Supabase Dashboard -> Storage -> Create New Bucket
--- Set bucket "uploads" sebagai PUBLIC.
-
--- ===============================================================================================
--- 23. PENGATURAN (Settings/Contact Info)
--- ===============================================================================================
-CREATE TABLE public.pengaturan (
+-- 18. Tabel Pengaturan Website (Kontak, Alamat, Medsos)
+CREATE TABLE IF NOT EXISTS public.pengaturan (
     id INT PRIMARY KEY DEFAULT 1,
     alamat TEXT,
     telepon VARCHAR(50),
@@ -293,7 +240,6 @@ CREATE TABLE public.pengaturan (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
-ALTER TABLE public.pengaturan ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public Read Pengaturan" ON public.pengaturan FOR SELECT USING (true);
-CREATE POLICY "Anon Write Pengaturan" ON public.pengaturan FOR ALL USING (true);
-*/
+-- STORAGE BUCKETS INSTRUCTIONS:
+-- Buat Bucket bernama "uploads" di Supabase Dashboard -> Storage -> Create New Bucket
+-- Set bucket "uploads" sebagai PUBLIC.
